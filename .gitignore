@@ -1,0 +1,8 @@
+build/
+sdkconfig
+sdkconfig.old
+.vscode/
+.cache/
+capture*
+pcap/
+compile_commands.json
