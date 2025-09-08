@@ -1,12 +1,9 @@
-# ttm4138
+# TTM4138 Wireless Security — ESP32-C6 Labs
 Library for the Wireless Security Student Lab Project
 
 This lab assignment explores the engineering of wireless security protocols using communicating IoT devices (ESP32-C6-DevKitC-1),
 with emphasis on IEEE 802.11 MAC layer frame communication.  The learning process will be facilitated by constructing and implementing principal 
-cryptographic protocols used in wireless networks. This repository contains the C library files and functions supporting the lab project.
-
-
-# TTM4138 Wireless Security — ESP32-C6 Labs
+cryptographic protocols used in wireless networks.
 
 This repository contains lab code and teaching utilities for the NTNU course **TTM4138 Wireless Security** on **ESP-IDF / ESP32-C6**. It includes reusable crypto components (ASCON, ECC) and Wi-Fi communication helpers (promiscuous/targeted RX, raw TX).
 
