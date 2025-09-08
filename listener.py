@@ -64,7 +64,7 @@ def add_packet_windows(packet_bytes, p):
     win32file.WriteFile(p, packet_header + raw_packet)
 
 
-def unix_complient_main():
+def unix_complient_main(exe_path):
     if len(sys.argv) < 2:
         print(textwrap.dedent(f"""
             Missing argument port_path
@@ -78,7 +78,7 @@ def unix_complient_main():
     f, path = create_pcap(filename)
     port = f"{sys.argv[1]}"
     ser = serial.Serial(port, 921600)
-    cmd = "tail -f -c +0 " + path + " | wireshark -k -i -"
+    cmd = "tail -f -c +0 " + path + f" | {exe_path} -k -i -"
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
 
     try:
@@ -163,8 +163,8 @@ if __name__ == "__main__":
         case "Windows":
             bad_os_main()
         case "Linux":
-            unix_complient_main()
+            unix_complient_main("wireshark")
         case "Darwin":
-            unix_complient_main()
+            unix_complient_main("/Applications/Wireshark.app/Contents/MacOS/Wireshark")
         case _ :
             raise Exception("System not suported")
