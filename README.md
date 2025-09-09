@@ -73,7 +73,7 @@ Use the **Espressif IDF** extension:
 2. Open this folder in VS Code.
 3. In the bottom status bar:
    - Select **Device Target**: ESP32-C6  
-   - Select **Serial Port** (e.g., `/dev/ttyUSB0` or `COMx`)
+   - Select **Serial Port** (e.g., `/dev/ttyUSB0`, `cu.usbmodem101`,`COMx` or another option depending on your device)
 4. To change which app is built (e.g., `main.c` vs `sniffer.c`), edit `main/CMakeLists.txt` and set the `SRCS` list accordingly (see below). Save the file—VS Code will reconfigure automatically.
 5. Use the extension buttons/commands:
    - **Build**, **Flash**, **Monitor** (or **Build, Flash and Start Monitor**).
