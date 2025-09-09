@@ -1,5 +1,5 @@
 # TTM4138 Wireless Security — ESP32-C6 Labs
-Library for the Wireless Security Student Lab Project
+## C Library for the Wireless Security Student Lab Project
 
 This lab assignment explores the engineering of wireless security protocols using communicating IoT devices (ESP32-C6-DevKitC-1),
 with emphasis on IEEE 802.11 MAC layer frame communication.  The learning process will be facilitated by constructing and implementing principal 
@@ -48,6 +48,23 @@ This repository contains lab code and teaching utilities for the NTNU course **T
 > [!NOTE]
 > Everything you typically **edit** is in `main/`. Everything in `components/` is reusable and already wired into the build.
 
+---
+## Useful ESP-IDF docs on the web
+
+- ESP-IDF Programming Guide (ESP32-C6):  
+  <https://docs.espressif.com/projects/esp-idf/en/latest/esp32c6/>
+
+- Wi-Fi driver & examples (ESP-IDF):  
+  <https://docs.espressif.com/projects/esp-idf/en/latest/esp32c6/api-reference/network/esp_wifi.html>
+
+- FreeRTOS (as used by ESP-IDF):  
+  <https://docs.espressif.com/projects/esp-idf/en/latest/esp32c6/api-reference/system/freertos.html>
+
+- `led_strip` component (component registry):  
+  <https://components.espressif.com/components/espressif/led_strip>
+
+- ESP32-C6 Datasheet / TRM:  
+  <https://www.espressif.com/en/support/documents/technical-documents>
 ---
 
 ## Prerequisites
@@ -156,25 +173,6 @@ All pages are in [`documentation/`](documentation/):
 - **Communication (Wi-Fi RX/TX helpers)** — [`ttm4138_communication.md`](documentation/ttm4138_communication.md)
 - **Setup (one-time init: queues, timers, Wi-Fi)** — [`ttm4138_setup.md`](documentation/ttm4138_setup.md)
 - **Utils (LED/button/timeout, helpers)** — [`ttm4138_utils.md`](documentation/ttm4138_utils.md)
-
----
-
-## Useful ESP-IDF docs on the web
-
-- ESP-IDF Programming Guide (ESP32-C6):  
-  <https://docs.espressif.com/projects/esp-idf/en/latest/esp32c6/>
-
-- Wi-Fi driver & examples (ESP-IDF):  
-  <https://docs.espressif.com/projects/esp-idf/en/latest/esp32c6/api-reference/network/esp_wifi.html>
-
-- FreeRTOS (as used by ESP-IDF):  
-  <https://docs.espressif.com/projects/esp-idf/en/latest/esp32c6/api-reference/system/freertos.html>
-
-- `led_strip` component (component registry):  
-  <https://components.espressif.com/components/espressif/led_strip>
-
-- ESP32-C6 Datasheet / TRM:  
-  <https://www.espressif.com/en/support/documents/technical-documents>
 
 ---
 
