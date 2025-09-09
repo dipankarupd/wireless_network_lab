@@ -33,8 +33,7 @@ This repository contains lab code and teaching utilities for the NTNU course **T
 │  ├─ ttm4138_setup.md
 │  ├─ ttm4138_utils.md
 │  └─ ttm4138_ecc.md           # (second/last ECC doc; helpers built on top of ecc.md)
-├─ main/                       # Example apps you can build/run
-│  ├─ main.c                   # Default entry
+├─ main/                       # Example apps you can build/run, feel free to add more files here
 │  └─ sniffer.c
 ├─ managed_components/         # External IDF components (e.g., led_strip)
 ├─ pcap/                       # Saved packet captures
