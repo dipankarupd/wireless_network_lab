@@ -155,14 +155,14 @@ void setup_target(uint16_t timeout_ms, char* target){
  * device_communication_role might me nonsensical if this setup method is used,
  * device_communication_role should therefore not be used in the remaining code.
  */
-void setup_unicast(uint16_t timeout_ms, char* target){
+void setup_unicast(uint16_t timeout_ms, char* peer){
     uint8_t mac[6];
     esp_read_mac(mac, ESP_MAC_WIFI_STA);  // Get MAC for Wi-Fi station
     char macStr[18];  // "AA:BB:CC:DD:EE:FF" + null terminator
     sprintf(macStr, "%02X:%02X:%02X:%02X:%02X:%02X",
             mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     strcpy(initiator_mac_addr_string, macStr);
-    strcpy(responder_mac_addr_string, target);
+    strcpy(responder_mac_addr_string, peer);
     setup(timeout_ms, REC_UNICAST);
 }
 

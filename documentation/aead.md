@@ -1,6 +1,12 @@
-# ASCON-128 AEAD API — Arguments, Return Values, Purpose & Global Side Effects
+# ASCON-128 AEAD API Documentation
 
-Each entry provides a brief **purpose**, the **arguments** and **return values**, and any **global state** the function modifies (none for these routines). Cross-references use `#` links for quick navigation.
+Documentation for the suplied ASCON library
+
+---
+
+## Definitely useful functions
+
+Each of the following functions was used at least once in the staff solution.
 
 ---
 

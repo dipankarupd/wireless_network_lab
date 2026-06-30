@@ -1,11 +1,8 @@
-# TTM4138 Wireless Security — ESP32-C6 Labs
-## C Library for the Wireless Security Student Lab Project
+# TTM4138 Wireless Security — ESP32-C6 lab project
 
-This lab assignment explores the engineering of wireless security protocols using communicating IoT devices (ESP32-C6-DevKitC-1),
-with emphasis on IEEE 802.11 MAC layer frame communication.  The learning process will be facilitated by constructing and implementing principal 
-cryptographic protocols used in wireless networks.
+In this lab, we will implement and explore different wireless security protocols. Each group will use three ESP32-C6 boards: two to send messages between each other, and one to spy on the communication.
 
-This repository contains lab code and teaching utilities for the NTNU course **TTM4138 Wireless Security** on **ESP-IDF / ESP32-C6**. It includes reusable crypto components (ASCON, ECC) and Wi-Fi communication helpers (promiscuous/targeted RX, raw TX).
+To simplify the implementation, the course staff have created a few library functions that you may use to solve the tasks. The task descriptions are available on Canvas.
 
 
 ---
@@ -14,17 +11,17 @@ This repository contains lab code and teaching utilities for the NTNU course **T
 
 ```
 .
-├─ components/                 # Reusable ESP-IDF components (libraries)
-│  ├─ aead/                    # ASCON-128 AEAD (encrypt/decrypt)
-│  ├─ auth/                    # ASCON-based PRF/Auth
-│  ├─ ecc/                     # secp256r1 big-int + EC ops
-│  ├─ hash/                    # ASCON HASH256
-│  ├─ global_variables/        # Shared queues, timers, MACs, etc.
-│  ├─ ttm4138_communication/   # Wi-Fi RX callbacks & raw TX helpers
-│  ├─ ttm4138_ecc/             # Small ECC helper wrappers for labs
-│  ├─ ttm4138_setup/           # One-time board/stack setup (queues, timers, Wi-Fi mode)
-│  └─ ttm4138_utils/           # LED, button, timeout helpers, misc utils
-├─ documentation/              # Per-component markdown docs
+├─ components/                      # Reusable ESP-IDF components (libraries)
+│  ├─ aead/                         # ASCON-128 AEAD (encrypt/decrypt)
+│  ├─ auth/                         # ASCON-based PRF/Auth
+│  ├─ ecc/                          # secp256r1 big-int + EC ops
+│  ├─ hash/                         # ASCON HASH256
+│  ├─ global_variables/             # Shared queues, timers, MACs, etc.
+│  ├─ ttm4138_communication/        # Wi-Fi RX callbacks & raw TX helpers
+│  ├─ ttm4138_ecc/                  # Small ECC helper wrappers for labs
+│  ├─ ttm4138_setup/                # One-time board/stack setup (queues, timers, Wi-Fi mode)
+│  └─ ttm4138_utils/                # LED, button, timeout helpers, misc utils
+├─ documentation/                   # Per-component markdown docs
 │  ├─ aead.md
 │  ├─ auth.md
 │  ├─ ecc.md
@@ -32,16 +29,17 @@ This repository contains lab code and teaching utilities for the NTNU course **T
 │  ├─ ttm4138_communication.md
 │  ├─ ttm4138_setup.md
 │  ├─ ttm4138_utils.md
-│  └─ ttm4138_ecc.md           # (second/last ECC doc; helpers built on top of ecc.md)
-├─ main/                       # Example apps you can build/run, feel free to add more files here
+│  └─ ttm4138_ecc.md                # (second/last ECC doc; helpers built on top of ecc.md)
+├─ main/                            # Example apps you can build/run, feel free to add more files here
 │  └─ sniffer.c
-├─ managed_components/         # External IDF components (e.g., led_strip)
-├─ pcap/                       # Saved packet captures
-├─ RC4/                        # Independent RC4 snippet (not part of ESP-IDF build)
-├─ listener.py                 # Host-side helper (e.g., serial/pcap glue)
-├─ CMakeLists.txt              # CMake entry point
-├─ sdkconfig                   # Your current build config (generated)
-└─ build/                      # Generated build artifacts (ignore/clean)
+│  └─ boilerplate_peer_to_peer.c    # Boilerplate for a satemachine based protocol
+├─ managed_components/              # External IDF components (e.g., led_strip)
+├─ pcap/                            # Saved packet captures
+├─ RC4/                             # Independent RC4 snippet (not part of ESP-IDF build)
+├─ listener.py                      # Host-side helper (e.g., serial/pcap glue)
+├─ CMakeLists.txt                   # CMake entry point
+├─ sdkconfig                        # Your current build config (generated)
+└─ build/                           # Generated build artifacts (ignore/clean)
 ```
 
 > [!NOTE]
@@ -52,6 +50,9 @@ This repository contains lab code and teaching utilities for the NTNU course **T
 
 - ESP-IDF Programming Guide (ESP32-C6):  
   <https://docs.espressif.com/projects/esp-idf/en/latest/esp32c6/>
+
+- ESP32-C6-DevKitC-1
+  <https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32c6/esp32-c6-devkitc-1/index.html>
 
 - Wi-Fi driver & examples (ESP-IDF):  
   <https://docs.espressif.com/projects/esp-idf/en/latest/esp32c6/api-reference/network/esp_wifi.html>
@@ -66,22 +67,16 @@ This repository contains lab code and teaching utilities for the NTNU course **T
   <https://www.espressif.com/en/support/documents/technical-documents>
 ---
 
-## Prerequisites
+## Installation
 
-- ESP-IDF installed & exported in your shell.
-- Hardware target: **ESP32-C6**.
+> [!IMPORTANT]
+> Do not install either the ESP toolchain or this repository in a path that contains spaces, as this will cause it to break. If you use Windows and have a space in your home folder, try installing the programs in the shared folder instead.
 
-Set target once per workspace:
-
-```
-idf.py set-target esp32c6
-```
-
----
+Follow the Installation guide on espressifs website <https://docs.espressif.com/projects/esp-idf/en/v6.0.2/esp32c6/get-started/index.html#>
 
 ## Build, flash, monitor (VS Code **&** CLI)
 
-### A) VS Code (recommended)
+### A) VS Code
 
 Use the **Espressif IDF** extension:
 
@@ -160,9 +155,11 @@ idf.py build flash monitor
 
 ---
 
-## Documentation (this repo)
+## Documentation
 
-All pages are in [`documentation/`](documentation/):
+ESP library documentation is available at <https://docs.espressif.com/projects/esp-idf/en/v6.0.2/esp32c6/api-reference/index.html>
+
+Course spesific documentation is available at [`documentation/`](documentation/):
 
 - **ASCON AEAD** — [`aead.md`](documentation/aead.md)
 - **ASCON Auth/PRF** — [`auth.md`](documentation/auth.md)
@@ -175,26 +172,23 @@ All pages are in [`documentation/`](documentation/):
 
 ---
 
-## Data flow cheat-sheet
-
-- **RX path:** `esp_wifi_set_promiscuous_rx_cb(...)` → one of  
-  `fsm_callback_targeted_listen` / `fsm_callback_promiscuous` / `fsm_callback_unicast`  
-  → enqueues `received_frame_info_t` into **`fsm_event_queue`**  
-  → your task consumes it (e.g., `print_frame`, or your own parser).  
-  Timeout events are injected via **`on_timeout`** (see [`ttm4138_utils.md#on_timeout`](documentation/ttm4138_utils.md#on_timeout)).
-
-- **TX path:** Build with **`create_frame`** → send with **`transmit`** (raw 802.11).
-
----
 
 ## Troubleshooting
 
-- **Toolchain/target errors**
+Some Troubleshooting tips
 
-  ```
-  idf.py set-target esp32c6
-  . $IDF_PATH/export.sh   # or the export script for your OS/shell
-  ```
+### Linux errors
+
+- **Insufficient permissions when flashing**
+  You are probably not a member of the group that owns the COM port. Check group ownership with `ls -l /dev/*`, and add yourself to the group with `usermod -a -G GROUP USERNAME`.
+
+### Windows errors
+
+- **Weird error message**
+  Have you made sure that both the project repository and the toolchain are installed in locations with no spaces in the path?
+
+
+### Errors with your code
 
 - **Queue fills / crash**  
   Always free `received_frame_info.frame` in your consumer (see examples in  

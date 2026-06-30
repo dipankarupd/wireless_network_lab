@@ -1,8 +1,15 @@
-# ECC Utilities (Order-Mod Operations) — Arguments, Return Values, Purpose & Global Side Effects
+# ECC Utilities Documentation
 
-The entries below document the functions from this header.  
-Each item includes a concise **purpose**, detailed **parameters**, **return values**, and any **global side effects** (none).  
-Cross-references use `#` links for quick navigation.
+This library provides some additional operations for big interger aritmetic
+
+> [!WARNING]
+> Do not use this library in production code, it is not constant time.
+
+---
+
+## Definitely useful functions
+
+Each of the following functions was used at least once in the staff solution.
 
 ---
 

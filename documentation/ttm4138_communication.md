@@ -1,4 +1,4 @@
-# TTM4138 Communication API — Arguments, Return Values, Purpose & Global Side Effects
+# TTM4138 Communication API Documentation
 
 This reference documents the public communication API.  
 Each entry provides a brief **purpose**, details of **arguments** and **return values**, and lists any **global state** the function modifies (without implementation details).  
@@ -43,6 +43,71 @@ Also remember to include the following headers:
 
 ---
 
+## Definitely useful functions
+
+Each of the following functions was used at least once in the staff solution.
+
+---
+
+### transmit
+
+```c
+esp_err_t transmit(uint8_t dest_addr[], uint8_t data[], uint16_t data_size);
+```
+
+**Purpose**  
+Transmit a custom IEEE 802.11 data frame to a specified destination MAC with the provided payload.
+
+**Parameters**
+
+| Name         | Type         | Description |
+|--------------|--------------|-------------|
+| `dest_addr`  | `uint8_t[]`  | Destination MAC address (6 bytes expected). |
+| `data`       | `uint8_t[]`  | Pointer to payload bytes to send. |
+| `data_size`  | `uint16_t`   | Payload size in bytes. |
+
+**Returns**  
+- `esp_err_t` — `ESP_OK` on success; otherwise an ESP-IDF error code from `esp_wifi_80211_tx`.
+
+**Global State Modified**  
+- None (uses the Wi-Fi driver to send a frame).
+
+
+## Possibly useful functions
+
+Although not used in the staff solution, these functions might still be useful in your solutions.
+
+---
+
+### print_frame
+
+```c
+void print_frame(void* arg);
+```
+
+**Purpose**  
+Continuously consume received frames from the FSM event queue, convert each frame to a hex string, and print it. Intended as a FreeRTOS task entry function for piping received frames to a console/host.
+
+**Parameters**  
+(none)
+
+**Returns**  
+- `void` — no return value (loops indefinitely).
+
+**Global State Modified**  
+- Drains from global `fsm_event_queue`; frees each received frame buffer after printing.
+
+**See also**  
+- Produces output for frames queued by: [fsm_callback_targeted_listen](#fsm_callback_targeted_listen), [fsm_callback_promiscious](#fsm_callback_promiscious), and [fsm_callback_unicast](#fsm_callback_unicast).
+
+---
+
+## Probably useless functions
+
+These functions are mostly intended to be used in the background by the library itself, but feel free to use them if you find a use for them.
+
+---
+
 ### configure_wifi
 
 ```c
@@ -74,54 +139,6 @@ Initialize Wi-Fi for packet reception and enable promiscuous parsing. Selects wh
 
 **See also**  
 - [fsm_callback_targeted_listen](#fsm_callback_targeted_listen) · [fsm_callback_promiscious](#fsm_callback_promiscious) · [fsm_callback_unicast](#fsm_callback_unicast)
-
----
-
-### transmit
-
-```c
-esp_err_t transmit(uint8_t dest_addr[], uint8_t data[], uint16_t data_size);
-```
-
-**Purpose**  
-Transmit a custom IEEE 802.11 data frame to a specified destination MAC with the provided payload.
-
-**Parameters**
-
-| Name         | Type         | Description |
-|--------------|--------------|-------------|
-| `dest_addr`  | `uint8_t[]`  | Destination MAC address (6 bytes expected). |
-| `data`       | `uint8_t[]`  | Pointer to payload bytes to send. |
-| `data_size`  | `uint16_t`   | Payload size in bytes. |
-
-**Returns**  
-- `esp_err_t` — `ESP_OK` on success; otherwise an ESP-IDF error code from `esp_wifi_80211_tx`.
-
-**Global State Modified**  
-- None (uses the Wi-Fi driver to send a frame).
-
----
-
-### print_frame
-
-```c
-void print_frame(void* arg);
-```
-
-**Purpose**  
-Continuously consume received frames from the FSM event queue, convert each frame to a hex string, and print it. Intended as a FreeRTOS task entry function for piping received frames to a console/host.
-
-**Parameters**  
-(none)
-
-**Returns**  
-- `void` — no return value (loops indefinitely).
-
-**Global State Modified**  
-- Drains from global `fsm_event_queue`; frees each received frame buffer after printing.
-
-**See also**  
-- Produces output for frames queued by: [fsm_callback_targeted_listen](#fsm_callback_targeted_listen), [fsm_callback_promiscious](#fsm_callback_promiscious), and [fsm_callback_unicast](#fsm_callback_unicast).
 
 ---
 

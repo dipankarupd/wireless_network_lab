@@ -1,6 +1,13 @@
-# ASCON Auth/PRF API — Arguments, Return Values, Purpose & Global Side Effects
+# ASCON Auth/PRF Documentation
 
-Each entry provides a brief **purpose**, details of **arguments** and **return values**, and lists any **global state** the function modifies (none, for these routines). Cross-references use `#` links for quick navigation.
+Documentation for the suplied ASCON authentication library
+
+---
+
+## Definitely useful functions
+
+Each of the following functions was used at least once in the staff solution.
+
 
 ---
 
@@ -32,6 +39,12 @@ ASCON-based **pseudorandom function (PRF)**. Derives a pseudorandom output from 
 **Notes**  
 - The caller must provide an output buffer `out` of at least `outlen` bytes.  
 - Input and output buffers must not overlap.
+
+---
+
+## Possibly useful functions
+
+Although not used in the staff solution, these functions might still be useful in your solutions.
 
 ---
 

@@ -1,50 +1,12 @@
-# TTM4138 Utils API — Arguments, Return Values, Purpose & Global Side Effects
+# TTM4138 Utils API Documentation
 
-Each entry provides a brief **purpose**, details of **arguments** and **return values**, and lists any **global state** the function modifies (without implementation details). Cross-references use `#` links for quick navigation.
-
----
-
-### configure_led
-
-```c
-void configure_led(void);
-```
-
-**Purpose**  
-The function is called by [setup](./ttm4138_setup.md) and does not need to be called again.
-
-Initialize and configure the onboard LED strip driver (RMT-backed), then clear and refresh the LED.
-
-**Parameters**  
-*(none)*
-
-**Returns**  
-- `void` — no return value.
-
-**Global State Modified**  
-- Initializes and assigns the LED driver handle `led_strip`.  
-- Updates the physical LED (cleared, then refreshed).
+Utility function that did not fit in anywhere else
 
 ---
 
-### cycle_light
+## Definitely useful functions
 
-```c
-void cycle_light(void);
-```
-
-**Purpose**  
-Cycle the on-board LED through **red → green → blue** states. Useful for visualizing state changes.
-
-**Parameters**  
-*(none)*
-
-**Returns**  
-- `void` — no return value.
-
-**Global State Modified**  
-- Reads and updates `light_state` (advances to the next color).  
-- Uses `led_strip` to set the LED color and calls its refresh routine.
+Each of the following functions was used at least once in the staff solution.
 
 ---
 
@@ -69,6 +31,53 @@ Print a sequence of bytes in hexadecimal format to standard output.
 
 **Global State Modified**  
 - None (writes to stdout only).
+
+---
+
+### start_timeout_timer
+
+```c
+void start_timeout_timer(void);
+```
+
+**Purpose**  
+(Re)start the non-repeating timeout timer so that it will expire once and invoke [on_timeout](#on_timeout), sending a no-frame marker into the event queue.
+
+**Parameters**  
+*(none)*
+
+**Returns**  
+- `void` — no return value.
+
+**Global State Modified**  
+- Stops and restarts the global FreeRTOS timer `timeout_timer`.
+
+---
+
+## Possibly useful functions
+
+Although not used in the staff solution, these functions might still be useful in your solutions.
+
+---
+
+### cycle_light
+
+```c
+void cycle_light(void);
+```
+
+**Purpose**  
+Cycle the on-board LED through **red → green → blue** states. Useful for visualizing state changes.
+
+**Parameters**  
+*(none)*
+
+**Returns**  
+- `void` — no return value.
+
+**Global State Modified**  
+- Reads and updates `light_state` (advances to the next color).  
+- Uses `led_strip` to set the LED color and calls its refresh routine.
 
 ---
 
@@ -121,6 +130,55 @@ Allocate and populate an IEEE 802.11 frame structure for transmission, setting t
 
 ---
 
+### wait_for_button_press
+
+```c
+void wait_for_button_press(void);
+```
+
+**Purpose**  
+Block until the **BOOT** button (GPIO 9) is pressed (active-low) and then released.
+
+**Parameters**  
+*(none)*
+
+**Returns**  
+- `void` — no return value.
+
+**Global State Modified**  
+- None (polls GPIO and delays the calling task until press-and-release is observed).
+
+---
+
+## Probably useless functions
+
+These functions are mostly intended to be used in the background by the library itself, but feel free to use them if you find a use for them.
+
+---
+
+### configure_led
+
+```c
+void configure_led(void);
+```
+
+**Purpose**  
+The function is called by [setup](./ttm4138_setup.md) and does not need to be called again.
+
+Initialize and configure the onboard LED strip driver (RMT-backed), then clear and refresh the LED.
+
+**Parameters**  
+*(none)*
+
+**Returns**  
+- `void` — no return value.
+
+**Global State Modified**  
+- Initializes and assigns the LED driver handle `led_strip`.  
+- Updates the physical LED (cleared, then refreshed).
+
+---
+
 ### on_timeout
 
 ```c
@@ -143,42 +201,3 @@ Timeout callback that signals a timeout event to the FSM by sending a no-frame m
 - [start_timeout_timer](#start_timeout_timer) — to (re)start the timer that ultimately triggers this callback.
 
 ---
-
-### start_timeout_timer
-
-```c
-void start_timeout_timer(void);
-```
-
-**Purpose**  
-(Re)start the non-repeating timeout timer so that it will expire once and invoke [on_timeout](#on_timeout).
-
-**Parameters**  
-*(none)*
-
-**Returns**  
-- `void` — no return value.
-
-**Global State Modified**  
-- Stops and restarts the global FreeRTOS timer `timeout_timer`.
-
----
-
-### wait_for_button_press
-
-```c
-void wait_for_button_press(void);
-```
-
-**Purpose**  
-Block until the **BOOT** button (GPIO 9) is pressed (active-low) and then released.
-
-**Parameters**  
-*(none)*
-
-**Returns**  
-- `void` — no return value.
-
-**Global State Modified**  
-- None (polls GPIO and delays the calling task until press-and-release is observed).
-

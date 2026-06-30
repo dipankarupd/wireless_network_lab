@@ -1,4 +1,12 @@
-# Hash API — Arguments, Return Values, Purpose & Global Side Effects
+# Hash API Documentation
+
+
+
+## Definitely useful functions
+
+Each of the following functions was used at least once in the staff solution.
+
+---
 
 ### hash
 

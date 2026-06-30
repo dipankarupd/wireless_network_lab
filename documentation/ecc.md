@@ -1,8 +1,15 @@
-# ECC (secp256r1) API — Arguments, Return Values, Purpose & Global Side Effects
+# ECC (secp256r1) Documentation
 
-The entries below document the functions declared in the ECC header.  
-Each item includes a concise **purpose**, detailed **parameters**, **return values**, and any **global side effects** (typically none).  
-Cross-references use `#` links for quick navigation.
+This library is usefull for ECC computation an big interger aritmetic
+
+> [!WARNING]
+> Do not use this library in production code, it is not constant time.
+
+---
+
+## Definitely useful functions
+
+Each of the following functions was used at least once in the staff solution.
 
 ---
 
@@ -36,6 +43,145 @@ $$ (resultx,\, resulty) = \text{secret} \cdot (px,\, py) $$
 **See also**  
 - [ecc_ecdh](#ecc_ecdh) — thin ECDH wrapper over this function.  
 - [ecc_gen_pub_key](#ecc_gen_pub_key) — computes `priv · G`.
+
+---
+
+### ecc_ec_add
+
+```c
+void ecc_ec_add(const uint32_t *px, const uint32_t *py, const uint32_t *qx, const uint32_t *qy, uint32_t *Sx, uint32_t *Sy);
+```
+
+**Purpose**  
+Elliptic-curve point addition:
+
+$$ (Sx,\, Sy) = (px,\, py) + (qx,\, qy) $$
+
+
+**Parameters**
+
+| Name | Type              | Description |
+|------|-------------------|-------------|
+| `px` | `const uint32_t*` | First point X (8 limbs). |
+| `py` | `const uint32_t*` | First point Y (8 limbs). |
+| `qx` | `const uint32_t*` | Second point X (8 limbs). |
+| `qy` | `const uint32_t*` | Second point Y (8 limbs). |
+| `Sx` | `uint32_t*`       | Output sum X (8 limbs). |
+| `Sy` | `uint32_t*`       | Output sum Y (8 limbs). |
+
+**Returns**  
+- `void`.
+
+**Global State Modified**  
+- None.
+
+---
+
+### ecc_fieldModO
+
+```c
+void ecc_fieldModO(const uint32_t *A, uint32_t *result, uint8_t length);
+```
+
+**Purpose**  
+Reduce a large integer `A` modulo the group order `n` using Barrett reduction; write the result to `result`.
+
+**Parameters**
+
+| Name     | Type              | Description |
+|----------|-------------------|-------------|
+| `A`      | `const uint32_t*` | Input value (up to `length` limbs). |
+| `result` | `uint32_t*`       | Output `A mod n` (up to 9 limbs depending on use). |
+| `length` | `uint8_t`         | Limb count of `A`. |
+
+**Returns**  
+- `void`.
+
+**Global State Modified**  
+- None.
+
+---
+
+### ecc_fieldInv
+
+```c
+void ecc_fieldInv(const uint32_t *A, const uint32_t *modulus, const uint32_t *reducer, uint32_t *B);
+```
+
+**Purpose**  
+Compute modular inverse via the binary extended Euclidean algorithm:
+
+$$ B = A^{-1} \bmod \text{modulus} $$
+
+**Parameters**
+
+| Name      | Type              | Description |
+|-----------|-------------------|-------------|
+| `A`       | `const uint32_t*` | Input value (arrayLength limbs). |
+| `modulus` | `const uint32_t*` | Field modulus (arrayLength limbs). |
+| `reducer` | `const uint32_t*` | Reduction constant used during halving steps. |
+| `B`       | `uint32_t*`       | Output inverse (arrayLength limbs). |
+
+**Returns**  
+- `void`.
+
+**Global State Modified**  
+- None.
+
+---
+
+### ecc_copy
+
+```c
+void ecc_copy(const uint32_t *from, uint32_t *to, uint8_t length);
+```
+
+**Purpose**  
+Copy `length` limbs from `from` to `to` (wrapper around `memcpy` for big numbers).
+
+**Parameters**
+
+| Name    | Type              | Description |
+|---------|-------------------|-------------|
+| `from`  | `const uint32_t*` | Source array. |
+| `to`    | `uint32_t*`       | Destination array. |
+| `length`| `uint8_t`         | Limb count. |
+
+**Returns**  
+- `void`.
+
+**Global State Modified**  
+- None.
+
+---
+
+### ecc_setZero
+
+```c
+void ecc_setZero(uint32_t *A, const int length);
+```
+
+**Purpose**  
+Set all `length` limbs of `A` to zero.
+
+**Parameters**
+
+| Name     | Type        | Description |
+|----------|-------------|-------------|
+| `A`      | `uint32_t*` | Target array. |
+| `length` | `const int` | Limb count. |
+
+**Returns**  
+- `void`.
+
+**Global State Modified**  
+- None.
+
+---
+
+## Possibly useful functions
+
+Although not used in the staff solution, these functions might still be useful in your solutions.
 
 ---
 
@@ -157,37 +303,6 @@ $$ (pub\_x,\, pub\_y) = \text{priv\_key} \cdot G $$
 | `priv_key` | `const uint32_t*` | Private key (8 limbs). |
 | `pub_x`    | `uint32_t*`       | Output X (8 limbs). |
 | `pub_y`    | `uint32_t*`       | Output Y (8 limbs). |
-
-**Returns**  
-- `void`.
-
-**Global State Modified**  
-- None.
-
----
-
-### ecc_ec_add
-
-```c
-void ecc_ec_add(const uint32_t *px, const uint32_t *py, const uint32_t *qx, const uint32_t *qy, uint32_t *Sx, uint32_t *Sy);
-```
-
-**Purpose**  
-Elliptic-curve point addition:
-
-$$ (Sx,\, Sy) = (px,\, py) + (qx,\, qy) $$
-
-
-**Parameters**
-
-| Name | Type              | Description |
-|------|-------------------|-------------|
-| `px` | `const uint32_t*` | First point X (8 limbs). |
-| `py` | `const uint32_t*` | First point Y (8 limbs). |
-| `qx` | `const uint32_t*` | Second point X (8 limbs). |
-| `qy` | `const uint32_t*` | Second point Y (8 limbs). |
-| `Sx` | `uint32_t*`       | Output sum X (8 limbs). |
-| `Sy` | `uint32_t*`       | Output sum Y (8 limbs). |
 
 **Returns**  
 - `void`.
@@ -379,84 +494,6 @@ Reduce a large integer `B` modulo the secp256r1 prime `p`, writing the reduced v
 
 ---
 
-### ecc_fieldModO
-
-```c
-void ecc_fieldModO(const uint32_t *A, uint32_t *result, uint8_t length);
-```
-
-**Purpose**  
-Reduce a large integer `A` modulo the group order `n` using Barrett reduction; write the result to `result`.
-
-**Parameters**
-
-| Name     | Type              | Description |
-|----------|-------------------|-------------|
-| `A`      | `const uint32_t*` | Input value (up to `length` limbs). |
-| `result` | `uint32_t*`       | Output `A mod n` (up to 9 limbs depending on use). |
-| `length` | `uint8_t`         | Limb count of `A`. |
-
-**Returns**  
-- `void`.
-
-**Global State Modified**  
-- None.
-
----
-
-### ecc_fieldInv
-
-```c
-void ecc_fieldInv(const uint32_t *A, const uint32_t *modulus, const uint32_t *reducer, uint32_t *B);
-```
-
-**Purpose**  
-Compute modular inverse via the binary extended Euclidean algorithm:
-
-$$ B = A^{-1} \bmod \text{modulus} $$
-
-**Parameters**
-
-| Name      | Type              | Description |
-|-----------|-------------------|-------------|
-| `A`       | `const uint32_t*` | Input value (arrayLength limbs). |
-| `modulus` | `const uint32_t*` | Field modulus (arrayLength limbs). |
-| `reducer` | `const uint32_t*` | Reduction constant used during halving steps. |
-| `B`       | `uint32_t*`       | Output inverse (arrayLength limbs). |
-
-**Returns**  
-- `void`.
-
-**Global State Modified**  
-- None.
-
----
-
-### ecc_copy
-
-```c
-void ecc_copy(const uint32_t *from, uint32_t *to, uint8_t length);
-```
-
-**Purpose**  
-Copy `length` limbs from `from` to `to` (wrapper around `memcpy` for big numbers).
-
-**Parameters**
-
-| Name    | Type              | Description |
-|---------|-------------------|-------------|
-| `from`  | `const uint32_t*` | Source array. |
-| `to`    | `uint32_t*`       | Destination array. |
-| `length`| `uint8_t`         | Limb count. |
-
-**Returns**  
-- `void`.
-
-**Global State Modified**  
-- None.
-
----
-
 ### ecc_isSame
 
 ```c
@@ -476,30 +513,6 @@ Constant-**non**-time equality check for two big integers.
 
 **Returns**  
 - `int` — `1` if equal; `0` otherwise.
-
-**Global State Modified**  
-- None.
-
----
-
-### ecc_setZero
-
-```c
-void ecc_setZero(uint32_t *A, const int length);
-```
-
-**Purpose**  
-Set all `length` limbs of `A` to zero.
-
-**Parameters**
-
-| Name     | Type        | Description |
-|----------|-------------|-------------|
-| `A`      | `uint32_t*` | Target array. |
-| `length` | `const int` | Limb count. |
-
-**Returns**  
-- `void`.
 
 **Global State Modified**  
 - None.
