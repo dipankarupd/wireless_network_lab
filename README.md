@@ -179,7 +179,7 @@ Some Troubleshooting tips
 
 ### Linux errors
 
-- **Insufficient permissions when flashing**
+- **Path is no readable when flashing**
   You are probably not a member of the group that owns the COM port. Check group ownership with `ls -l /dev/*`, and add yourself to the group with `usermod -a -G GROUP USERNAME`.
 
 ### Windows errors

@@ -14,6 +14,38 @@ Each of the following functions was used at least once in the staff solution.
 
 ---
 
+### setup
+
+```c
+void setup(uint16_t timeout_ms, receive_mode_t receive_mode);
+```
+
+**Purpose**  
+Configures the device as either initiator or responder based on the global variables `initiator_mac_addr_string` and `responder_mac_addr_string`.
+
+It does also configures logging, LED, Wi-Fi (in the specified receive mode), creates the FSM event queue and a one-shot timeout timerand reads the local MAC address. 
+
+**Parameters**
+
+| Name           | Type              | Description |
+|----------------|-------------------|-------------|
+| `timeout_ms`   | `uint16_t`        | Timeout period for the one-shot timer, in milliseconds. |
+| `receive_mode` | `receive_mode_t`  | Wi-Fi receive configuration (e.g., `REC_TARGET`, `REC_PROMISCUOUS`, `REC_UNICAST`). |
+
+**Returns**  
+- `void` — no return value.
+
+**Global State Modified**  
+- Logging level (system-wide).  
+- LED and Wi-Fi subsystems configured.  
+- `fsm_event_queue` created/assigned.  
+- `timeout_timer` created/assigned.  
+- `local_mac_addr` populated.  
+- Potentially `remote_mac_addr` and/or `target_mac_addr` populated depending on detected role.  
+- `device_communication_role` set based on MAC comparison.
+
+---
+
 ### setup_promiscuous
 
 ```c
@@ -67,6 +99,12 @@ Configure the device for **targeted sniffing** of a specific MAC address. Sets t
 
 ---
 
+## Possibly useful functions
+
+Although not used in the staff solution, these functions might still be useful in your solutions.
+
+---
+
 ### setup_responder
 
 ```c
@@ -116,13 +154,6 @@ Configure the device as the **unicast initiator** toward a specified responder M
 - Same as [setup_unicast](#setup_unicast).
 
 ---
-
-## Possibly useful functions
-
-Although not used in the staff solution, these functions might still be useful in your solutions.
-
----
-
 ### setup_unicast
 
 ```c
@@ -158,36 +189,5 @@ Configure the device for **unicast communication** with a peer.
 ## Probably useless functions
 
 These functions are mostly intended to be used in the background by the library itself, but feel free to use them if you find a use for them.
-
----
-
-### setup
-
-```c
-void setup(uint16_t timeout_ms, receive_mode_t receive_mode);
-```
-
-**Purpose**  
-Initialize system subsystems and establish the device’s communication role.  
-Configures logging, LED, Wi-Fi (in the specified receive mode), creates the FSM event queue and a one-shot timeout timer, reads the local MAC address, and derives the device role (initiator/responder/sniffer/undefined) by comparing known MAC addresses. 
-
-**Parameters**
-
-| Name           | Type              | Description |
-|----------------|-------------------|-------------|
-| `timeout_ms`   | `uint16_t`        | Timeout period for the one-shot timer, in milliseconds. |
-| `receive_mode` | `receive_mode_t`  | Wi-Fi receive configuration (e.g., `REC_TARGET`, `REC_PROMISCUOUS`, `REC_UNICAST`). |
-
-**Returns**  
-- `void` — no return value.
-
-**Global State Modified**  
-- Logging level (system-wide).  
-- LED and Wi-Fi subsystems configured.  
-- `fsm_event_queue` created/assigned.  
-- `timeout_timer` created/assigned.  
-- `local_mac_addr` populated.  
-- Potentially `remote_mac_addr` and/or `target_mac_addr` populated depending on detected role.  
-- `device_communication_role` set based on MAC comparison.
 
 ---

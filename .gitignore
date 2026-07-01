@@ -6,3 +6,4 @@ sdkconfig.old
 capture*
 pcap/
 compile_commands.json
+eim_config.toml

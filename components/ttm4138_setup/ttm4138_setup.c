@@ -10,6 +10,7 @@
 #include <esp_log.h>
 
 // project headers
+#include "freertos/idf_additions.h"
 #include "global_variables.h"
 #include "ttm4138_setup.h"
 #include "ttm4138_utils.h"
@@ -38,7 +39,7 @@ void setup(uint16_t timeout_ms, receive_mode_t receive_mode) {
     fsm_event_queue = xQueueCreate(EVENT_QUEUE_SIZE, sizeof(received_frame_info_t));
 
     // timer setup
-    timeout_timer = xTimerCreate("tmo", pdMS_TO_TICKS(timeout_ms), pdFALSE, NULL, on_timeout);
+    timeout_timer = xTimerCreate("tmo", pdMS_TO_TICKS(timeout_ms), pdFALSE, NULL, (TimerCallbackFunction_t)on_timeout);
 
     // determine device role
     uint8_t initiator_mac_addr_buffer[MAC_ADDR_LEN];  // buffer used for the next memcmp

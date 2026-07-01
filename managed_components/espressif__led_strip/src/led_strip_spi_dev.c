@@ -9,6 +9,7 @@
 #include "esp_log.h"
 #include "esp_check.h"
 #include "esp_rom_gpio.h"
+#include "esp_heap_caps.h"
 #include "soc/spi_periph.h"
 #include "led_strip.h"
 #include "led_strip_interface.h"
