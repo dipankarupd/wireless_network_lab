@@ -7,3 +7,4 @@ ESP_main_lab/capture*
 ESP_main_lab/pcap/
 ESP_main_lab/compile_commands.json
 ESP_main_lab/eim_config.toml
+Prosim/sim
