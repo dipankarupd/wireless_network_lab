@@ -18,8 +18,8 @@ void app_main(void) {
 
     setup_promiscuous(1000);
     while (1) {
-        wait_for_button_press();
         cycle_light();
+        wait_for_button_press();
         ESP_LOGI("test.c", "Cycling light");
     }
 
