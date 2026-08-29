@@ -99,6 +99,10 @@ Configure (optional)
 ```
 idf.py menuconfig
 ```
+Set target
+```
+idf.py set-target esp32-c6
+```
 Build
 ```
 idf.py build
