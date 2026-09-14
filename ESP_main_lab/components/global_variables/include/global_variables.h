@@ -21,12 +21,6 @@ typedef enum {
 } communication_role_t;
 
 typedef enum {
-    RESULT_VALID_FORMAT,
-    RESULT_INVALID_FORMAT,
-    RESULT_TIMEOUT
-} result_t;
-
-typedef enum {
     REC_UNICAST,
     REC_PROMISCUOUS,
     REC_TARGET
@@ -49,10 +43,10 @@ typedef struct {
 } ieee80211_frame_t;
 
 typedef struct {
-    uint8_t            contains_frame;
+    uint8_t            event;
     ieee80211_frame_t* frame;
     uint16_t           length;
-} received_frame_info_t;
+} event_t;
 
 // global variables
 extern uint8_t local_mac_addr[MAC_ADDR_LEN];   // local mac address

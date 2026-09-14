@@ -122,7 +122,7 @@ void cycle_light() {
  * Sends a frame info struct with contains_frame = 0 to signal a timeout.
  */
 void on_timeout() {
-    received_frame_info_t received_frame_info = { .contains_frame = 0 };
+    event_t received_frame_info = { .event = 0 };
     xQueueSend(fsm_event_queue, &received_frame_info, 0);
 }
 

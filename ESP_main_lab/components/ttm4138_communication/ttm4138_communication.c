@@ -128,7 +128,7 @@ void fsm_callback_targeted_listen(void* buf, wifi_promiscuous_pkt_type_t type) {
 
     // determine destination
     if(memcmp(target_mac_addr, frame->addr1, MAC_ADDR_LEN) == 0 || memcmp(target_mac_addr, frame->addr2, MAC_ADDR_LEN) == 0){
-        received_frame_info_t received_frame_info = {.contains_frame = 1, .frame = frame, .length = length};
+        event_t received_frame_info = {.event = 1, .frame = frame, .length = length};
         // xQueueSendFromISR(fsm_event_queue, &received_frame_info, NULL); // TODO should this be used?
         BaseType_t result = xQueueSend(fsm_event_queue, &received_frame_info, 0);
         if (result == errQUEUE_FULL) {
@@ -160,7 +160,7 @@ void fsm_callback_promiscious(void* buf, wifi_promiscuous_pkt_type_t type) {
     memcpy(frame, pkt->payload, length);
 
     // determine destination
-    received_frame_info_t received_frame_info = {.contains_frame = 1, .frame = frame, .length = length};
+    event_t received_frame_info = {.event = 1, .frame = frame, .length = length};
     BaseType_t result = xQueueSend(fsm_event_queue, &received_frame_info, 0);
     if (result == errQUEUE_FULL) {
         free(frame); // id 3
@@ -189,7 +189,7 @@ void fsm_callback_unicast(void* buf, wifi_promiscuous_pkt_type_t type) {
 
     // determine destination
     if(memcmp(local_mac_addr, frame->addr1, MAC_ADDR_LEN) == 0){
-        received_frame_info_t received_frame_info = {.contains_frame = 1, .frame = frame, .length = length};
+        event_t received_frame_info = {.event = 1, .frame = frame, .length = length};
         // xQueueSendFromISR(fsm_event_queue, &received_frame_info, NULL); // TODO should this be used?
         BaseType_t result = xQueueSend(fsm_event_queue, &received_frame_info, 0);
         if (result == errQUEUE_FULL) {
@@ -214,10 +214,10 @@ void fsm_callback_unicast(void* buf, wifi_promiscuous_pkt_type_t type) {
  *       after printing. The received frame's memory is also freed after use.
  */
 void print_frame(void* arg){
-    received_frame_info_t received_frame_info;
+    event_t received_frame_info;
     while (1) {
         if (xQueueReceive(fsm_event_queue, &received_frame_info, portMAX_DELAY)) {
-            if (received_frame_info.contains_frame == 0) { // timeout
+            if (received_frame_info.event == 0) { // timeout
                 continue;
             } else {
                 uint8_t* bytes = (uint8_t*)received_frame_info.frame;

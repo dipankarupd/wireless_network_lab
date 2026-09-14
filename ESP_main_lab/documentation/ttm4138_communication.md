@@ -11,24 +11,18 @@ Cross-references use `#` links for quick navigation.
 After [setup](./ttm4138_setup.md), received packets are added to the queue `fsm_event_queue`. Below is an example of how to receive messages from that queue. You may choose to handle them differently based on your code’s requirements, but remember to free the received frame; otherwise, the code will eventually crash as memory fills up with packets. This example function only accepts messages that match the layout of the specified struct `YOUR_MESSAGE_STRUCT_HERE`. If you need it to handle multiple message types, you will have to modify it accordingly.
 
 ```c
-int GetMessage(YOUR_MESSAGE_STRUCT_HERE* protocol_message) {
-    received_frame_info_t received_frame_info;
-
-    if (xQueueReceive(fsm_event_queue, &received_frame_info, portMAX_DELAY)) {
-        if (received_frame_info.contains_frame == 0) {
-            // Timeout event — no frame buffer was allocated for this entry.
-            return 0;
+void GetMessage(YOUR_MESSAGE_STRUCT_HERE* protocol_message) {
+    event_t event;
+    while (1) {
+        if (xQueueReceive(fsm_event_queue, &event, pdMS_TO_TICKS(TIMEOUT_MS))) {
+            if (event.event == 1) {
+                // Copy your protocol payload out of the received frame.
+                memcpy(protocol_message, received_frame_info.frame->data, sizeof(*protocol_message));
+                // Always free the frame buffer after processing to avoid memory leaks.
+                free(event.frame); // id 1
+            }
         }
-
-        // Copy your protocol payload out of the received frame.
-        memcpy(protocol_message, received_frame_info.frame->data, sizeof(*protocol_message));
-
-        // Always free the frame buffer after processing to avoid memory leaks.
-        free(received_frame_info.frame);
-        return 1;
     }
-
-    return -1; // Queue receive failed or was interrupted.
 }
 ```
 Also remember to include the following headers:
@@ -38,7 +32,7 @@ Also remember to include the following headers:
 #include <freertos/FreeRTOS.h>   // core FreeRTOS definitions
 #include <freertos/queue.h>      // xQueueReceive, queue types
 
-#include "global_variables.h"    // received_frame_info_t
+#include "global_variables.h"    // event_t
 ```
 
 ---
@@ -163,7 +157,7 @@ Receive callback for **unicast** filtering. Copies the incoming packet, checks i
 
 **Global State Modified**  
 - Allocates a frame buffer per packet; on successful enqueue, ownership of the buffer transfers to the consumer (e.g., [print_frame](#print_frame)); if the queue is full or the packet is not relevant, the buffer is freed immediately.  
-- Pushes `received_frame_info_t` into global `fsm_event_queue`.
+- Pushes `event_t` into global `fsm_event_queue`.
 
 ---
 
@@ -190,7 +184,7 @@ Receive callback for **promiscuous (all frames)**. Copies every incoming packet 
 
 **Global State Modified**  
 - Allocates a frame buffer per packet; on successful enqueue, ownership of the buffer transfers to the consumer (e.g., [print_frame](#print_frame)); if the queue is full, the buffer is freed.  
-- Pushes `received_frame_info_t` into global `fsm_event_queue`.
+- Pushes `event_t` into global `fsm_event_queue`.
 
 ---
 
@@ -215,5 +209,5 @@ Receive callback for **targeted sniffing**. Copies the incoming packet, checks i
 
 **Global State Modified**  
 - Allocates a frame buffer only for processing; frees it if the frame is not relevant or the queue is full.  
-- Pushes `received_frame_info_t` into global `fsm_event_queue` for relevant frames.
+- Pushes `event_t` into global `fsm_event_queue` for relevant frames.
 

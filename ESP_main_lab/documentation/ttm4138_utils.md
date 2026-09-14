@@ -186,7 +186,7 @@ void on_timeout(void);
 ```
 
 **Purpose**  
-Timeout callback that signals a timeout event to the FSM by sending a no-frame marker into the event queue.
+Timeout callback that signals a timeout event to the FSM by sending an event = 0 marker into the event queue.
 
 **Parameters**  
 *(none)*
@@ -195,7 +195,7 @@ Timeout callback that signals a timeout event to the FSM by sending a no-frame m
 - `void` — no return value.
 
 **Global State Modified**  
-- Sends a `received_frame_info_t` with `contains_frame = 0` to the global queue `fsm_event_queue`.
+- Sends a `event_t` with `event = 0` to the global queue `fsm_event_queue`.
 
 **See also**  
 - [start_timeout_timer](#start_timeout_timer) — to (re)start the timer that ultimately triggers this callback.

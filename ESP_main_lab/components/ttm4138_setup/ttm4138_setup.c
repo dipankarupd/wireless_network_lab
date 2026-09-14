@@ -36,7 +36,7 @@ void setup(uint16_t timeout_ms, receive_mode_t receive_mode) {
     configure_wifi(receive_mode);
 
     // fsm setup
-    fsm_event_queue = xQueueCreate(EVENT_QUEUE_SIZE, sizeof(received_frame_info_t));
+    fsm_event_queue = xQueueCreate(EVENT_QUEUE_SIZE, sizeof(event_t));
 
     // timer setup
     timeout_timer = xTimerCreate("tmo", pdMS_TO_TICKS(timeout_ms), pdFALSE, NULL, (TimerCallbackFunction_t)on_timeout);
@@ -156,14 +156,14 @@ void setup_target(uint16_t timeout_ms, char* target){
  * device_communication_role might me nonsensical if this setup method is used,
  * device_communication_role should therefore not be used in the remaining code.
  */
-void setup_unicast(uint16_t timeout_ms, char* peer){
+void setup_unicast(uint16_t timeout_ms, char* target){
     uint8_t mac[6];
     esp_read_mac(mac, ESP_MAC_WIFI_STA);  // Get MAC for Wi-Fi station
     char macStr[18];  // "AA:BB:CC:DD:EE:FF" + null terminator
     sprintf(macStr, "%02X:%02X:%02X:%02X:%02X:%02X",
             mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     strcpy(initiator_mac_addr_string, macStr);
-    strcpy(responder_mac_addr_string, peer);
+    strcpy(responder_mac_addr_string, target);
     setup(timeout_ms, REC_UNICAST);
 }
 
