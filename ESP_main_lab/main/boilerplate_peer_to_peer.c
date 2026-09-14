@@ -119,7 +119,6 @@ void fsm_task(void* arg) {
     event_t event;
     while (1) {
         if (xQueueReceive(fsm_event_queue, &event, pdMS_TO_TICKS(TIMEOUT_MS))) {
-            xTimerStop(timeout_timer, 0);
             xQueueReset(fsm_event_queue);
 
             if (device_communication_role == ROLE_INITIATOR) {
