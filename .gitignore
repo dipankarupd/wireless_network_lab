@@ -8,3 +8,10 @@ ESP_main_lab/pcap/
 ESP_main_lab/compile_commands.json
 ESP_main_lab/eim_config.toml
 Prosim/sim
+# macOS
+.DS_Store
+
+# Compiled files
+*.o
+*.out
+ESP_main_lab/main/exp3_host
