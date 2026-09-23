@@ -138,7 +138,7 @@ void initiator_state_machine(protocol_event_t event){
             case START:
                 M_t m1 = {.type = M1};
                 transmit(remote_mac_addr, (uint8_t*) &m1, sizeof(m1));
-                current_initiator_state = SENT_1;
+                current_initiator_state = I_SENT_1;
                 start_timeout_timer();
                 break;
             case RECEIVED_FRAME:
@@ -170,12 +170,12 @@ void initiator_state_machine(protocol_event_t event){
                     ESP_LOGE("initiator_state_machine", "Invalid message type for state");
                     protocol_event_t wrong_packet_event = { .event_type =  MESSAGE_FAILED};
                     xQueueSend(fsm_event_queue, &wrong_packet_event, 0);
-                    current_initiator_state = RECEIVED_2;
+                    current_initiator_state = I_RECEIVED_2;
                     break;
                 }
                 protocol_event_t correct_packet_event = { .event_type =  MESSAGE_VALID};
                 xQueueSend(fsm_event_queue, &correct_packet_event, 0);
-                current_initiator_state = RECEIVED_2;
+                current_initiator_state = I_RECEIVED_2;
                 break;
             case TIMEOUT:
                 //TODO implement locic for timeout, what should happen
@@ -217,12 +217,12 @@ void responder_state_machine(protocol_event_t event){
                      // What happens on error? Add you own code.
                     protocol_event_t wrong_packet_event = { .event_type =  MESSAGE_FAILED};
                     xQueueSend(fsm_event_queue, &wrong_packet_event, 0);
-                    current_responder_state = RECEIVED_1;
+                    current_responder_state = R_RECEIVED_1;
                     break;
                 }
                 protocol_event_t correct_packet_event = { .event_type =  MESSAGE_VALID};
                 xQueueSend(fsm_event_queue, &correct_packet_event, 0);
-                current_responder_state = RECEIVED_1;
+                current_responder_state = R_RECEIVED_1;
                 break;
             case MESSAGE_FAILED:
                 //What happens when it encounters an unexpected event
