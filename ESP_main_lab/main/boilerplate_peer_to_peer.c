@@ -90,10 +90,10 @@ typedef enum events{
    The RECEIVED_FRAME event is put in the event queue when a frame is received 
    This event-type will contain the received frame.
 */
-    ieee80211_frame_t* frame;
     
 typedef struct {
     event_type_t       event_type;
+    ieee80211_frame_t* frame;
     uint16_t           length;
 } protocol_event_t;
 
