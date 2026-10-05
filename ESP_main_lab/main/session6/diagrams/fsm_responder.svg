@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="1440" viewBox="0 0 1900 1440">
+<rect width="1900" height="1440" fill="white"/>
+<text x="40.0" y="52.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="start" fill="#202124">P2P protocol — Responder R (finite state machine)</text>
+<text x="40.0" y="86.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="normal" text-anchor="start" fill="#5f6368">Mealy machine: each arrow is  event [guard] / action.  The number on an arrow refers to the table below.</text>
+<line x1="40" y1="122" x2="80" y2="122" stroke="#3c4043" stroke-width="4"/>
+<text x="90.0" y="128.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">start / normal step</text>
+<line x1="310.88" y1="122" x2="350.88" y2="122" stroke="#188038" stroke-width="4"/>
+<text x="360.9" y="128.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">frame accepted</text>
+<line x1="534.16" y1="122" x2="574.16" y2="122" stroke="#e37400" stroke-width="4"/>
+<text x="584.2" y="128.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">frame dropped</text>
+<line x1="747.92" y1="122" x2="787.92" y2="122" stroke="#7b1fa2" stroke-width="4"/>
+<text x="797.9" y="128.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">timeout</text>
+<line x1="904.56" y1="122" x2="944.56" y2="122" stroke="#c5221f" stroke-width="4"/>
+<text x="954.6" y="128.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">goes to error</text>
+<circle cx="120" cy="500" r="12" fill="#202124"/>
+<line x1="132" y1="500" x2="320" y2="500" stroke="#202124" stroke-width="3"/>
+<polygon points="334.0,500.0 318.0,507.2 318.0,492.8" fill="#202124"/>
+<text x="120.0" y="540.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" text-anchor="middle" fill="#5f6368">power on</text>
+<path d="M516.9,461.6 Q815.0,330.0 1094.8,453.5" fill="none" stroke="#188038" stroke-width="3"/>
+<polygon points="1094.8,453.5 1077.3,453.7 1083.1,440.5" fill="#188038"/>
+<rect x="652.4" y="369.8" width="316.0" height="36" rx="7" fill="white" fill-opacity="0.93" stroke="#188038" stroke-width="1.2"/>
+<circle cx="673.4" cy="387.8" r="15" fill="#188038"/>
+<text x="673.4" y="393.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">1</text>
+<text x="696.4" y="393.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="normal" text-anchor="start" fill="#202124">PING x = n0 (new session)</text>
+<path d="M468.6,413.2 C532.2,311.4 327.8,311.4 391.4,413.2" fill="none" stroke="#c5221f" stroke-width="3"/>
+<polygon points="391.4,413.2 376.8,403.5 389.0,395.8" fill="#c5221f"/>
+<rect x="277.3" y="283.4" width="305.4" height="36" rx="7" fill="white" fill-opacity="0.93" stroke="#c5221f" stroke-width="1.2"/>
+<circle cx="298.3" cy="301.4" r="15" fill="#c5221f"/>
+<text x="298.3" y="307.4" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">2</text>
+<text x="321.3" y="307.4" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="normal" text-anchor="start" fill="#202124">PING x ≠ n0 → send ERROR</text>
+<path d="M391.4,586.8 C327.8,688.6 532.2,688.6 468.6,586.8" fill="none" stroke="#e37400" stroke-width="3"/>
+<polygon points="468.6,586.8 483.2,596.5 471.0,604.2" fill="#e37400"/>
+<rect x="261.4" y="694.6" width="337.3" height="36" rx="7" fill="white" fill-opacity="0.93" stroke="#e37400" stroke-width="1.2"/>
+<circle cx="282.4" cy="712.6" r="15" fill="#e37400"/>
+<text x="282.4" y="718.6" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">3</text>
+<text x="305.4" y="718.6" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="normal" text-anchor="start" fill="#202124">other frame / stray timeout</text>
+<path d="M1225.9,387.9 C1270.7,271.2 1090.7,287.0 1155.1,394.1" fill="none" stroke="#188038" stroke-width="3"/>
+<polygon points="1155.1,394.1 1140.7,384.1 1153.0,376.7" fill="#188038"/>
+<rect x="1103.3" y="260.3" width="156.4" height="36" rx="7" fill="white" fill-opacity="0.93" stroke="#188038" stroke-width="1.2"/>
+<circle cx="1124.3" cy="278.3" r="15" fill="#188038"/>
+<text x="1124.3" y="284.3" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">4</text>
+<text x="1147.3" y="284.3" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="normal" text-anchor="start" fill="#202124">PING x = e</text>
+<path d="M1297.5,439.1 C1407.2,390.3 1272.1,276.9 1243.1,393.4" fill="none" stroke="#e37400" stroke-width="3"/>
+<polygon points="1243.1,393.4 1240.0,376.1 1253.9,379.6" fill="#e37400"/>
+<rect x="1340.1" y="312.2" width="390.5" height="36" rx="7" fill="white" fill-opacity="0.93" stroke="#e37400" stroke-width="1.2"/>
+<circle cx="1361.1" cy="330.2" r="15" fill="#e37400"/>
+<text x="1361.1" y="336.2" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">8</text>
+<text x="1384.1" y="336.2" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="normal" text-anchor="start" fill="#202124">old / ahead PING, invalid → drop</text>
+<path d="M1312.1,525.9 C1424.1,568.9 1408.7,393.3 1305.9,455.1" fill="none" stroke="#188038" stroke-width="3"/>
+<polygon points="1305.9,455.1 1315.9,440.7 1323.3,453.0" fill="#188038"/>
+<rect x="1413.8" y="467.8" width="326.6" height="36" rx="7" fill="white" fill-opacity="0.93" stroke="#188038" stroke-width="1.2"/>
+<circle cx="1434.8" cy="485.8" r="15" fill="#188038"/>
+<text x="1434.8" y="491.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">5</text>
+<text x="1457.8" y="491.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="normal" text-anchor="start" fill="#202124">PING x = e−2 → resend PONG</text>
+<path d="M1260.9,597.5 C1309.7,707.2 1423.1,572.1 1306.6,543.1" fill="none" stroke="#188038" stroke-width="3"/>
+<polygon points="1306.6,543.1 1323.9,540.0 1320.4,553.9" fill="#188038"/>
+<rect x="1365.8" y="626.1" width="273.4" height="36" rx="7" fill="white" fill-opacity="0.93" stroke="#188038" stroke-width="1.2"/>
+<circle cx="1386.8" cy="644.1" r="15" fill="#188038"/>
+<text x="1386.8" y="650.1" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">6</text>
+<text x="1409.8" y="650.1" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="normal" text-anchor="start" fill="#202124">PING x = n0 → restart</text>
+<path d="M1164.5,609.4 C1111.9,717.2 1288.1,717.2 1235.5,609.4" fill="none" stroke="#7b1fa2" stroke-width="3"/>
+<polygon points="1235.5,609.4 1249.0,620.6 1236.1,626.9" fill="#7b1fa2"/>
+<rect x="1068.6" y="718.6" width="262.8" height="36" rx="7" fill="white" fill-opacity="0.93" stroke="#7b1fa2" stroke-width="1.2"/>
+<circle cx="1089.6" cy="736.6" r="15" fill="#7b1fa2"/>
+<text x="1089.6" y="742.6" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">7</text>
+<text x="1112.6" y="742.6" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="normal" text-anchor="start" fill="#202124">timeout, idle+1 &lt; 10</text>
+<path d="M1092.8,541.7 Q815.0,650.0 518.5,534.5" fill="none" stroke="#188038" stroke-width="3"/>
+<polygon points="518.5,534.5 536.0,533.6 530.8,547.0" fill="#188038"/>
+<rect x="737.5" y="578.1" width="145.8" height="36" rx="7" fill="white" fill-opacity="0.93" stroke="#188038" stroke-width="1.2"/>
+<circle cx="758.5" cy="596.1" r="15" fill="#188038"/>
+<text x="758.5" y="602.1" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">9</text>
+<text x="781.5" y="602.1" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="normal" text-anchor="start" fill="#202124">END x = e</text>
+<path d="M1112.7,574.8 Q815.0,830.0 502.1,561.8" fill="none" stroke="#7b1fa2" stroke-width="3"/>
+<polygon points="502.1,561.8 519.0,566.8 509.6,577.7" fill="#7b1fa2"/>
+<rect x="626.6" y="683.2" width="369.2" height="36" rx="7" fill="white" fill-opacity="0.93" stroke="#7b1fa2" stroke-width="1.2"/>
+<circle cx="647.6" cy="701.2" r="15" fill="#7b1fa2"/>
+<text x="647.6" y="707.2" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">10</text>
+<text x="670.6" y="707.2" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="normal" text-anchor="start" fill="#202124">timeout, idle+1 = 10 (abandon)</text>
+<circle cx="430" cy="500" r="95" fill="#f1f3f4" stroke="#5f6368" stroke-width="3.5"/>
+<text x="430.0" y="500.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="23" font-weight="bold" text-anchor="middle" fill="#202124">R_IDLE</text>
+<text x="430.0" y="528.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" text-anchor="middle" fill="#5f6368" font-style="italic">no session</text>
+<circle cx="1200" cy="500" r="115" fill="#e8f0fe" stroke="#1a73e8" stroke-width="3.5"/>
+<text x="1200.0" y="500.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="23" font-weight="bold" text-anchor="middle" fill="#202124">R_IN_SESSION</text>
+<text x="1200.0" y="528.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" text-anchor="middle" fill="#5f6368" font-style="italic">expecting e</text>
+<rect x="40" y="850" width="1820" height="44" fill="#f1f3f4"/>
+<text x="52.0" y="878.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="bold" text-anchor="start" fill="#202124">#</text>
+<text x="108.0" y="878.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="bold" text-anchor="start" fill="#202124">From → To</text>
+<text x="408.0" y="878.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="bold" text-anchor="start" fill="#202124">Event [guard]</text>
+<text x="948.0" y="878.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="bold" text-anchor="start" fill="#202124">Action</text>
+<circle cx="66" cy="916.0" r="14" fill="#188038"/>
+<text x="66.0" y="921.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">1</text>
+<text x="108.0" y="922.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">R_IDLE → R_IN_SESSION</text>
+<text x="408.0" y="922.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">recv PING(x, a_I) [x = n0]</text>
+<text x="948.0" y="922.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">k ← 1, e ← x+2, idle ← 0, send PONG(x+1, a_R), start_timer(W)</text>
+<rect x="40" y="938" width="1820" height="44" fill="#fafafa"/>
+<circle cx="66" cy="960.0" r="14" fill="#c5221f"/>
+<text x="66.0" y="965.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">2</text>
+<text x="108.0" y="966.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">R_IDLE → R_IDLE</text>
+<text x="408.0" y="966.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">recv PING(x, a_I) [x ≠ n0]</text>
+<text x="948.0" y="966.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">send ERROR(x, out of sync): R lost its state (reboot) or session ended</text>
+<circle cx="66" cy="1004.0" r="14" fill="#e37400"/>
+<text x="66.0" y="1009.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">3</text>
+<text x="108.0" y="1010.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">R_IDLE → R_IDLE</text>
+<text x="408.0" y="1010.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">recv other frame  or  stray timeout</text>
+<text x="948.0" y="1010.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">drop / ignore      (invalid_drop)</text>
+<rect x="40" y="1026" width="1820" height="44" fill="#fafafa"/>
+<circle cx="66" cy="1048.0" r="14" fill="#188038"/>
+<text x="66.0" y="1053.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">4</text>
+<text x="108.0" y="1054.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">R_IN_SESSION → R_IN_SESSION</text>
+<text x="408.0" y="1054.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">recv PING(x, a_I) [x = e]</text>
+<text x="948.0" y="1054.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">k++, e ← x+2, idle ← 0, send PONG(x+1, a_R), restart_timer(W)</text>
+<circle cx="66" cy="1092.0" r="14" fill="#188038"/>
+<text x="66.0" y="1097.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">5</text>
+<text x="108.0" y="1098.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">R_IN_SESSION → R_IN_SESSION</text>
+<text x="408.0" y="1098.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">recv PING(x, a_I) [x = e−2]</text>
+<text x="948.0" y="1098.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">idle ← 0, resend(last_msg), restart_timer(W): our PONG was lost</text>
+<rect x="40" y="1114" width="1820" height="44" fill="#fafafa"/>
+<circle cx="66" cy="1136.0" r="14" fill="#188038"/>
+<text x="66.0" y="1141.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">6</text>
+<text x="108.0" y="1142.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">R_IN_SESSION → R_IN_SESSION</text>
+<text x="408.0" y="1142.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">recv PING(x, a_I) [x = n0]</text>
+<text x="948.0" y="1142.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">restart session as in 1: I rebooted and began again</text>
+<circle cx="66" cy="1180.0" r="14" fill="#7b1fa2"/>
+<text x="66.0" y="1185.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">7</text>
+<text x="108.0" y="1186.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">R_IN_SESSION → R_IN_SESSION</text>
+<text x="408.0" y="1186.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">timeout [idle+1 &lt; 10]</text>
+<text x="948.0" y="1186.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">idle++, restart_timer(W)</text>
+<rect x="40" y="1202" width="1820" height="44" fill="#fafafa"/>
+<circle cx="66" cy="1224.0" r="14" fill="#e37400"/>
+<text x="66.0" y="1229.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">8</text>
+<text x="108.0" y="1230.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">R_IN_SESSION → R_IN_SESSION</text>
+<text x="408.0" y="1230.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">recv PING [x older or ahead]  or  invalid</text>
+<text x="948.0" y="1230.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">drop, never abort      (replay_drop / invalid_drop)</text>
+<circle cx="66" cy="1268.0" r="14" fill="#188038"/>
+<text x="66.0" y="1273.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">9</text>
+<text x="108.0" y="1274.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">R_IN_SESSION → R_IDLE</text>
+<text x="408.0" y="1274.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">recv END(x, a_I) [x = e]</text>
+<text x="948.0" y="1274.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">stop_timer, log SUCCESS</text>
+<rect x="40" y="1290" width="1820" height="44" fill="#fafafa"/>
+<circle cx="66" cy="1312.0" r="14" fill="#7b1fa2"/>
+<text x="66.0" y="1317.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">10</text>
+<text x="108.0" y="1318.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">R_IN_SESSION → R_IDLE</text>
+<text x="408.0" y="1318.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">timeout [idle+1 = 10]</text>
+<text x="948.0" y="1318.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">log &quot;initiator silent&quot;: ABANDONED (I gave up, or END was lost)</text>
+<rect x="40" y="850" width="1820" height="484" fill="none" stroke="#dadce0" stroke-width="1.5"/>
+<line x1="96" y1="850" x2="96" y2="1334" stroke="#dadce0" stroke-width="1"/>
+<line x1="396" y1="850" x2="396" y2="1334" stroke="#dadce0" stroke-width="1"/>
+<line x1="936" y1="850" x2="936" y2="1334" stroke="#dadce0" stroke-width="1"/>
+<text x="40.0" y="1374.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">Variables (EFSM):  e = counter expected in the next PING · k = completed rounds · idle = silent timeouts in a row · W = 2000 ms · 10 = MAX + 2 (outlasts I&#x27;s resends)</text>
+<text x="40.0" y="1404.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">Every other event in a state is listed in the code and only logged (Appendix C.2).  R has no final state: after a session it waits for the next one.</text>
+</svg>
