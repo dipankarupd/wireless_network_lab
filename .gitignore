@@ -14,4 +14,5 @@ Prosim/sim
 # Compiled files
 *.o
 *.out
-ESP_main_lab/main/exp3_host
+ESP_main_lab/main/session3/exp3_host
+Prosim/p2p/p2psim

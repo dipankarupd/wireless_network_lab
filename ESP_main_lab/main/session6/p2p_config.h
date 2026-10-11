@@ -21,7 +21,7 @@
 #define P2P_N0            0x3A7F12C4u  /* pre-shared random start value n0 */
 #endif
 #ifndef P2P_T
-#define P2P_T             5            /* number of ping-pong rounds (try 10000 too) */
+#define P2P_T             50          /* number of ping-pong rounds (try 10000 too) */
 #endif
 
 /* ---- Timing ---- */
