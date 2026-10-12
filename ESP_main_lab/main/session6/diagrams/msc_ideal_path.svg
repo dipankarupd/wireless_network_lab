@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1905" viewBox="0 0 1800 1905">
+<rect width="1800" height="1905" fill="white"/>
+<text x="40.0" y="52.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="start" fill="#202124">P2P protocol — message sequence diagram of the ideal path</text>
+<line x1="1240" y1="190" x2="1240" y2="1755" stroke="#188038" stroke-width="2" stroke-dasharray="7 6"/>
+<line x1="560" y1="190" x2="560" y2="1755" stroke="#1a73e8" stroke-width="2" stroke-dasharray="7 6"/>
+<text x="40.0" y="86.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="normal" text-anchor="start" fill="#5f6368">Every message arrives, every check passes. Boxes = local computations; arrows = frames on the air. Example values: T = 5.</text>
+<rect x="390" y="120" width="340" height="70" rx="10" fill="#1a73e8" fill-opacity="0.12" stroke="#1a73e8" stroke-width="2.5"/>
+<text x="560.0" y="150.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#202124">Initiator I</text>
+<text x="560.0" y="176.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="middle" fill="#5f6368">a_I = 48:f6:ee:c7:1f:18</text>
+<rect x="1070" y="120" width="340" height="70" rx="10" fill="#188038" fill-opacity="0.12" stroke="#188038" stroke-width="2.5"/>
+<text x="1240.0" y="150.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#202124">Responder R</text>
+<text x="1240.0" y="176.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="middle" fill="#5f6368">a_R = 48:f6:ee:c7:20:f0</text>
+<rect x="420" y="210" width="960" height="40" rx="6" fill="#f1f3f4" stroke="#dadce0"/>
+<text x="900.0" y="236.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" font-weight="normal" text-anchor="middle" fill="#202124">(0) pre-shared by both:  n0 = 0x3A7F12C4,  T,  a_I,  a_R,  Ascon key K (16 bytes)</text>
+<rect x="108" y="274" width="430" height="141" rx="8" fill="#1a73e8" fill-opacity="0.08" stroke="#1a73e8" stroke-width="1.5"/>
+<text x="122.0" y="302.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">START event (board boots)</text>
+<text x="122.0" y="327.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">k ← 0,  n ← n0</text>
+<text x="122.0" y="352.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">nonce ← 16 random bytes (TRNG)</text>
+<text x="122.0" y="377.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">body ← Ascon-encrypt([n]) + tag</text>
+<text x="122.0" y="402.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">start timer W = 2 s;  → I_WAIT_PONG</text>
+<line x1="538" y1="344.5" x2="560" y2="344.5" stroke="#1a73e8" stroke-width="1.5" stroke-dasharray="4 4"/>
+<text x="900.0" y="449.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="bold" text-anchor="middle" fill="#1a73e8">(1)  PING  ⟨a_I, nonce⟩ [ n0 ]</text>
+<line x1="560" y1="461" x2="1226" y2="461" stroke="#1a73e8" stroke-width="3"/>
+<polygon points="1240,461 1224,454 1224,468" fill="#1a73e8"/>
+<text x="900.0" y="485.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" text-anchor="middle" fill="#5f6368" font-style="italic">n0 = 3a 7f 12 c4</text>
+<rect x="1262" y="511" width="430" height="141" rx="8" fill="#188038" fill-opacity="0.08" stroke="#188038" stroke-width="1.5"/>
+<text x="1276.0" y="539.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">verify Ascon tag  ✓</text>
+<text x="1276.0" y="564.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">ã_I = a_I  ✓    ñ = n0  ✓  (new session)</text>
+<text x="1276.0" y="589.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">k ← 1,  e ← ñ + 2   (next PING expected)</text>
+<text x="1276.0" y="614.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">reply with ñ + 1;  start timer W</text>
+<text x="1276.0" y="639.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">→ R_IN_SESSION</text>
+<line x1="1262" y1="581.5" x2="1240" y2="581.5" stroke="#188038" stroke-width="1.5" stroke-dasharray="4 4"/>
+<text x="900.0" y="686.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="bold" text-anchor="middle" fill="#188038">(2)  PONG  ⟨a_R, nonce⟩ [ n0+1 ]</text>
+<line x1="1240" y1="698" x2="574" y2="698" stroke="#188038" stroke-width="3"/>
+<polygon points="560,698 576,691 576,705" fill="#188038"/>
+<text x="900.0" y="722.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" text-anchor="middle" fill="#5f6368" font-style="italic">3a 7f 12 c5</text>
+<rect x="108" y="748" width="430" height="116" rx="8" fill="#1a73e8" fill-opacity="0.08" stroke="#1a73e8" stroke-width="1.5"/>
+<text x="122.0" y="776.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">stop timer;  verify Ascon tag  ✓</text>
+<text x="122.0" y="801.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">ã_R = a_R  ✓    ñ = n + 1  ✓</text>
+<text x="122.0" y="826.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">k ← k + 1 = 1;   k &lt; T → continue</text>
+<text x="122.0" y="851.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">n ← ñ + 1;  send PING;  restart timer W</text>
+<line x1="538" y1="806.0" x2="560" y2="806.0" stroke="#1a73e8" stroke-width="1.5" stroke-dasharray="4 4"/>
+<text x="900.0" y="898.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="bold" text-anchor="middle" fill="#1a73e8">(3)  PING  ⟨a_I, nonce⟩ [ n0+2 ]</text>
+<line x1="560" y1="910" x2="1226" y2="910" stroke="#1a73e8" stroke-width="3"/>
+<polygon points="1240,910 1224,903 1224,917" fill="#1a73e8"/>
+<text x="900.0" y="934.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" text-anchor="middle" fill="#5f6368" font-style="italic">3a 7f 12 c6</text>
+<rect x="1262" y="960" width="430" height="91" rx="8" fill="#188038" fill-opacity="0.08" stroke="#188038" stroke-width="1.5"/>
+<text x="1276.0" y="988.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">verify tag  ✓   ã_I = a_I  ✓   ñ = e  ✓</text>
+<text x="1276.0" y="1013.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">k ← 2,  e ← ñ + 2</text>
+<text x="1276.0" y="1038.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">reply with ñ + 1;  restart timer W</text>
+<line x1="1262" y1="1005.5" x2="1240" y2="1005.5" stroke="#188038" stroke-width="1.5" stroke-dasharray="4 4"/>
+<text x="900.0" y="1085.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="bold" text-anchor="middle" fill="#188038">PONG  ⟨a_R, nonce⟩ [ n0+3 ]</text>
+<line x1="1240" y1="1097" x2="574" y2="1097" stroke="#188038" stroke-width="3"/>
+<polygon points="560,1097 576,1090 576,1104" fill="#188038"/>
+<text x="900.0" y="1121.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" text-anchor="middle" fill="#5f6368" font-style="italic">3a 7f 12 c7</text>
+<rect x="420" y="1153" width="960" height="40" rx="6" fill="#f1f3f4" stroke="#dadce0"/>
+<text x="900.0" y="1179.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" font-weight="normal" text-anchor="middle" fill="#202124">(4)  …  the exchange (2)–(3) repeats: I sends n0 + 2(k−1), R answers n0 + 2k − 1  …</text>
+<text x="900.0" y="1235.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="bold" text-anchor="middle" fill="#1a73e8">PING  ⟨a_I, nonce⟩ [ n0 + 2T − 2 ]</text>
+<line x1="560" y1="1247" x2="1226" y2="1247" stroke="#1a73e8" stroke-width="3"/>
+<polygon points="1240,1247 1224,1240 1224,1254" fill="#1a73e8"/>
+<text x="900.0" y="1271.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" text-anchor="middle" fill="#5f6368" font-style="italic">last round, T = 5:  3a 7f 12 cc</text>
+<rect x="1262" y="1295" width="430" height="66" rx="8" fill="#188038" fill-opacity="0.08" stroke="#188038" stroke-width="1.5"/>
+<text x="1276.0" y="1323.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">verify  ✓    ñ = e  ✓</text>
+<text x="1276.0" y="1348.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">k ← T,  e ← ñ + 2</text>
+<line x1="1262" y1="1328.0" x2="1240" y2="1328.0" stroke="#188038" stroke-width="1.5" stroke-dasharray="4 4"/>
+<text x="900.0" y="1395.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="bold" text-anchor="middle" fill="#188038">PONG  ⟨a_R, nonce⟩ [ n0 + 2T − 1 ]</text>
+<line x1="1240" y1="1407" x2="574" y2="1407" stroke="#188038" stroke-width="3"/>
+<polygon points="560,1407 576,1400 576,1414" fill="#188038"/>
+<text x="900.0" y="1431.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" text-anchor="middle" fill="#5f6368" font-style="italic">3a 7f 12 cd</text>
+<rect x="108" y="1457" width="430" height="91" rx="8" fill="#1a73e8" fill-opacity="0.08" stroke="#1a73e8" stroke-width="1.5"/>
+<text x="122.0" y="1485.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">stop timer;  verify  ✓    ñ = n + 1  ✓</text>
+<text x="122.0" y="1510.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">k ← k + 1 = T   → finished</text>
+<text x="122.0" y="1535.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">send END with ñ + 1</text>
+<line x1="538" y1="1502.5" x2="560" y2="1502.5" stroke="#1a73e8" stroke-width="1.5" stroke-dasharray="4 4"/>
+<text x="900.0" y="1582.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="bold" text-anchor="middle" fill="#1a73e8">(4)  END  ⟨a_I, nonce⟩ [ n0 + 2T ]</text>
+<line x1="560" y1="1594" x2="1226" y2="1594" stroke="#1a73e8" stroke-width="3"/>
+<polygon points="1240,1594 1224,1587 1224,1601" fill="#1a73e8"/>
+<text x="900.0" y="1618.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" text-anchor="middle" fill="#5f6368" font-style="italic">3a 7f 12 ce</text>
+<rect x="108" y="1644" width="430" height="66" rx="8" fill="#1a73e8" fill-opacity="0.08" stroke="#1a73e8" stroke-width="1.5"/>
+<text x="122.0" y="1672.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">→ I_DONE</text>
+<text x="122.0" y="1697.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">print SUMMARY: SUCCESS, T / T rounds</text>
+<line x1="538" y1="1677.0" x2="560" y2="1677.0" stroke="#1a73e8" stroke-width="1.5" stroke-dasharray="4 4"/>
+<rect x="1262" y="1644" width="430" height="91" rx="8" fill="#188038" fill-opacity="0.08" stroke="#188038" stroke-width="1.5"/>
+<text x="1276.0" y="1672.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">verify  ✓    ñ = e  ✓</text>
+<text x="1276.0" y="1697.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">stop timer;  → R_IDLE</text>
+<text x="1276.0" y="1722.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#202124">print SUMMARY: SUCCESS, T / T rounds</text>
+<line x1="1262" y1="1689.5" x2="1240" y2="1689.5" stroke="#188038" stroke-width="1.5" stroke-dasharray="4 4"/>
+<line x1="40" y1="1775" x2="1760" y2="1775" stroke="#dadce0" stroke-width="1.5"/>
+<text x="40.0" y="1811.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#202124">⟨ … ⟩  associated data: sent readable, but covered by the Ascon tag.     [ … ]  encrypted.   Every frame also carries magic 0x6A, the message type and the 16-byte tag.</text>
+<text x="40.0" y="1839.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#202124">x̃ (tilde) = the value as received, not yet trusted (lab text convention).     k = completed rounds,  n = counter in I&#x27;s last PING,  e = counter R expects next.</text>
+<text x="40.0" y="1867.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#202124">Counter rule: I&#x27;s messages carry n0 + even offsets, R&#x27;s carry odd offsets; every message is the previous one + 1.  Without encryption (P2P_USE_AEAD 0) the same flow runs with a zero nonce, plain counter and no tag.</text>
+</svg>
