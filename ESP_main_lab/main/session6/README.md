@@ -504,13 +504,111 @@ The SUMMARY block is the evidence: `resent`, `duplicates handled`, the `dropped:
 
 ## Checkpoint 5: Wireshark, plaintext vs. encrypted
 
-Use a third board as the sniffer (Appendix B): set `LAB_APP` to `"tools/sniffer.c"` and call `setup_target(TIMEOUT_MS, "<MAC of I>")`. Capture one run with `P2P_USE_AEAD 0` and one with `1`.
+> *"Show samples of the non-encrypted and the encrypted frames that you have captured."* (tasks 8–9)
 
-What to point out in the payload after `AA AA 03 69 69 69 69 69`:
+A third ESP32-C6 board acts as an eavesdropper. It captures the frames that I and R exchange over the air, and Wireshark displays them. We captured one run with encryption off and one with encryption on, and compared the same message in both.
 
-- **Plaintext:** `6A 01 <a_I> 00…00 3A 7F 12 C4 00`. The counter n0 = `3A7F12C4` is readable, and the next PONG carries `3A7F12C5`. Anyone can read, predict and forge the next message.
-- **AEAD:** magic, type and sender are still readable, because associated data is authenticated but not encrypted. The nonce is random for every frame. The 5 body bytes look random and change even when the same counter pattern repeats, and a 16-byte tag follows.
-- **Extra (reordering and replay):** re-sending a captured frame is dropped (`replay_drop`) or answered as a duplicate. It never advances the protocol.
+### Setup
+
+```
+I (…1f:18) ──PING──► R (…20:f0)        I and R on Dipankar's laptop, running the protocol
+I          ◄──PONG── R
+      ▲
+      │ hears the frames over the air
+Sniffer (3rd board) ──USB──► listener.py ──► Wireshark      on a teammate's laptop
+```
+
+- **Sniffer firmware:** `main/tools/sniffer.c` (Appendix B) in **target mode**, listening only to frames to or from the initiator:
+  ```c
+  // setup_promiscuous(TIMEOUT_MS);
+  setup_target(TIMEOUT_MS, "48:f6:ee:c7:1f:18");
+  ```
+  Built with `set(LAB_APP "tools/sniffer.c")` and flashed once. The sniffer laptop then only needs `listener.py`, Python with `pyserial`, and Wireshark.
+- **Use target mode, not promiscuous.** Our first attempt in promiscuous mode captured about 3800 frames from every device in the room (Apple mDNS/AWDL, a Cisco access point), and only 7 of our 11. The sniffer's queue holds just 10 frames, so ours were dropped when it overflowed. Appendix B warns about this. In target mode we captured all 11 frames of every run.
+- **Capture:** `python listener.py /dev/ttyACM0` (Linux) or `/dev/cu.usbmodemXXXX` (macOS) opens Wireshark live. The capture is also saved under `pcap/`.
+- **Procedure:**
+  1. Flash I and R with `P2P_USE_AEAD 0`, start the capture, and press RST on I to start a run. Save as `plaintext.pcapng`.
+  2. Set `P2P_USE_AEAD 1`, build, and flash I and R (the sniffer is unchanged). Repeat. Save as `encrypted.pcapng`.
+
+### Wireshark filters
+
+| Filter | Shows |
+|---|---|
+| `llc.oui == 0x696969` | only our P2P frames: the lab library's LLC/SNAP header `AA AA 03 69 69 69 69 69` |
+| `wlan.addr == 48:f6:ee:c7:1f:18` | everything to and from the initiator |
+| `data.data[0:2] == 6a:01` / `6a:02` / `6a:03` | PINGs / PONGs / END |
+| `data.data[24:4] == 3a:7f:12:c4` | the frame carrying n0 (plaintext only) |
+
+Typing only `llc.oui` (without `== 0x696969`) shows **every** LLC frame from every device. That's not what we want.
+
+To read a frame: click it, then expand **IEEE 802.11 Data** (transmitter/receiver address) → **Logical-Link Control** (`Organization Code: 69:69:69`, `Protocol ID: 0x6969`) → **Data**: our message, highlighted in the hex pane.
+
+Two things look odd but are normal:
+- **The Time column is always 0.000000**, because `listener.py` writes no timestamps. Use the `No.` column for the order.
+- **The Data field includes 4 extra bytes** at the end: the radio's frame check sequence (FCS). That's why it shows 33 / 49 bytes instead of 29 / 45.
+
+### Capture 1: plaintext (`P2P_USE_AEAD 0`)
+
+All 11 frames of one run, alternating I → R and R → I, with frame length 65 bytes and Data 33 bytes.
+
+**Frame 1, the first PING, Data:**
+```
+6a 01 48 f6 ee c7 1f 18  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  3a 7f 12 c4  00  00 00 00 59
+│  │  └── sender ──────┘  └────────────── nonce: 16 zero bytes ──────────┘  └─ counter ─┘  │  └── FCS ──┘
+magic type = 01 (PING)    I's MAC                                            n0            code
+```
+
+**The whole run:**
+
+| No. | Source → Destination | Type | Counter (Data bytes 24–27) | Message |
+|---|---|---|---|---|
+| 1 | `1f:18` → `20:f0` | `01` | `3a 7f 12 c4` | PING n0 |
+| 2 | `20:f0` → `1f:18` | `02` | `3a 7f 12 c5` | PONG n0+1 |
+| 3 | `1f:18` → `20:f0` | `01` | `3a 7f 12 c6` | PING n0+2 |
+| … | alternating | | +1 every frame | |
+| 10 | `20:f0` → `1f:18` | `02` | `3a 7f 12 cd` | PONG n0+9 |
+| 11 | `1f:18` → `20:f0` | `03` | `3a 7f 12 ce` | END n0+10 |
+
+**What an eavesdropper learns:**
+- who talks to whom, the message type, and **every counter value**
+- the counter is **predictable**: after `…c7` the next PING will carry `…c8`
+- **nothing protects the frame:** zero nonce, no tag. An attacker could forge `6a 01 48 f6 ee c7 1f 18 00…00 3a 7f 12 c8 00`, and R would accept it as the real next PING.
+
+### Capture 2: encrypted (`P2P_USE_AEAD 1`)
+
+All 11 frames of one run again, with frame length **81 bytes** and Data **49 bytes**.
+
+**Frame 1, the same PING n0, Data:**
+```
+6a 01 48 f6 ee c7 1f 18                            magic, type 01 = PING, sender = I's MAC   (8 bytes, readable)
+1e ee 38 70 46 88 62 fb b7 04 91 7c b2 84 e6 b9    nonce: 16 random bytes                    (readable, random)
+be 7a 65 a5 0a                                     encrypted counter + code                  (5 bytes, unreadable)
+60 c0 e5 9e f6 17 dc 6b c2 94 6f d9 19 c5 6f c4    Ascon tag                                 (16 bytes)
+00 00 00 49                                        FCS (radio checksum)
+```
+
+### Side by side: the same message (PING n0)
+
+| Field | Plaintext | Encrypted |
+|---|---|---|
+| magic + type | `6a 01` | `6a 01` (unchanged, readable) |
+| sender | `48 f6 ee c7 1f 18` | `48 f6 ee c7 1f 18` (unchanged, readable) |
+| nonce | `00 00 … 00` | `1e ee 38 70 … e6 b9`: random, new in every frame |
+| counter + code | `3a 7f 12 c4 00`: n0 readable | `be 7a 65 a5 0a`: unreadable |
+| tag | none | `60 c0 e5 9e … 6f c4` (16 bytes) |
+| Data length (incl. FCS) | 33 bytes | 49 bytes |
+| Frame length | 65 bytes | 81 bytes |
+
+### What the comparison shows
+
+1. **Confidentiality:** the counter is hidden. An eavesdropper can no longer read or predict the sequence.
+2. **Every frame looks different.** The random nonce means even identical messages never look the same on the air, so the ciphertext reveals no patterns.
+3. **Some fields stay visible, by design.** Magic, type and sender are *associated data*: not encrypted, so frames can still be identified and routed, but they are covered by the tag.
+4. **Integrity and authenticity:** the tag covers the header, the nonce and the ciphertext. Changing any byte, or forging a frame without the key, makes the receiver reject it. Checkpoint 4, Test 2 showed this live: `invalid_drop: AEAD tag verification failed`.
+5. **The cost:** 16 extra bytes per frame (the tag) and the Ascon computation. The run took the same time (about 2 s) in both modes.
+6. **What still leaks:** message type, sender, frame length and timing. That allows traffic analysis, as listed in the security analysis below.
+
+**Task 9 extra (changing the order of frames):** replaying captured frames from Wireshark isn't practical with this setup. The simulator shows the effect instead: `./p2psim -r 0.2` in `Prosim/p2p` replays recorded frames, and the receiver drops them as `replay_drop` because their counters are stale.
 
 ---
 
