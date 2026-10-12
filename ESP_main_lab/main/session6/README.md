@@ -6,17 +6,59 @@
 | `p2p_unidirectional.c` | Task 1: I sends a frame every 2 s, R cycles the LED on receive |
 | `p2p_fsm.h` / `p2p_fsm.c` | Tasks 2–7: the two state machines. Platform independent, so the same file runs on the boards and in the simulator |
 | `p2p_protocol.c` | ESP32 side: radio frames, timer, LED, logging, `app_main` |
+| `diagrams/msc_ideal_path.png` | Message sequence diagram of the ideal path (checkpoint 1) |
 | `diagrams/fsm_initiator.png`, `diagrams/fsm_responder.png` | The two state diagrams (checkpoint 2) |
 | `../../../Prosim/p2p/` | Laptop simulator running the same `p2p_fsm.c` (Appendix C, learning goal 4) |
+
+## What Session 6 asks
+
+The two ESP32-C6 boards send raw 802.11 **data frames directly to each other**, peer-to-peer and without an access point, using the lab library's `transmit()` and its receive callback. On top of that we build a ping-pong protocol called **P2P** between an initiator I and a responder R.
+
+### The protocol as given in the lab text
+
+> **(0)** I and R pre-share four constants: a random start of a sequence number n0, an iteration number T, and the device identities, normally the MAC addresses.
+>
+> **(1)** The initiator I begins by sending the number n0 and its identity string a_I addressed to the responder R.
+>
+> **(2)** The responder R receives the frame and verifies that the received identity ã_I and the received number ñ are equal to the expected pre-shared values. If true, R increments the number by one (n + 1), stores it, and sends it addressed to R.
+>
+> **(3)** The initiator I receives a frame, verifies that the sender's identity and the incremented value are as expected. Then the initiator behaves as the responder: the received counter value is incremented, stored, and returned to the responder together with the initiator's identity a_I.
+>
+> **(4)** Repeat this exchange of (2) and (3) T times, and then end the communication.
+
+Two notes on the text:
+- **Tilde convention:** a value with a tilde (ã_I, ñ) is the value as **received**, which cannot be trusted until it has been checked. We use the same convention in our diagrams.
+- **A typo:** step (2) says R "sends it addressed to **R**". It must be addressed to **I**, since R replies to the initiator.
+
+### Tasks and checkpoints, and where they are answered
+
+| Task | What it asks | Where |
+|---|---|---|
+| 1 | one-way frames, LED on receive | `p2p_unidirectional.c` |
+| 2 | message sequence diagram of the ideal path | Checkpoint 1 below, `diagrams/msc_ideal_path.png` |
+| 3 | failure analysis; FSMs for I and R | Checkpoint 2 below, `diagrams/fsm_*.png` |
+| 4 | read Appendix C | design follows Appendix C (Checkpoint 2) |
+| 5 | implement with nested switch/case | `p2p_fsm.c`, `p2p_protocol.c` (Checkpoint 3) |
+| 6 | test with T = 5 and larger T, delay, distance | Checkpoint 4 |
+| 7 | Ascon AEAD encryption and integrity | `P2P_USE_AEAD` in `p2p_config.h`; `p2p_encode` / `p2p_decode` |
+| 8–9 | sniff with a third board, compare plaintext vs. encrypted | Checkpoint 5 |
+
+| Checkpoint | Shows |
+|---|---|
+| 1 | annotated message sequence diagram of the ideal path |
+| 2 | FSM diagrams and the deviations handled automatically |
+| 3 | the C implementation, explained |
+| 4 | live runs while inflicting bad events |
+| 5 | captured plaintext and encrypted frames |
+
+---
 
 ## Getting started
 
 1. In `main/CMakeLists.txt`, set `LAB_APP` to `"session6/p2p_unidirectional.c"` (task 1) or `"session6/p2p_protocol.c" "session6/p2p_fsm.c"` (the protocol).
 2. Find the two boards' MAC addresses (see below) and put them into `P2P_INITIATOR_MAC` / `P2P_RESPONDER_MAC` in `p2p_config.h`.
 3. Build and flash the **same** firmware to both boards. The role is chosen by MAC.
-4. Start the monitor on both boards (two laptops is easiest). Either order works, because I resends until R answers.
-
-> Note: the lab text says in step (2) that R "sends it addressed to R". That is a typo. R replies to **I**.
+4. Open the monitors: **R first, then I**. Opening a monitor resets that board, and I starts the protocol as soon as it boots. If R's monitor is opened after I's, R is reset in the middle of the run (or after it), and you don't see a complete run on both screens. To start another run later, press RST on the I board, or `Ctrl+T` then `Ctrl+R` in its monitor.
 
 ### Finding the MAC address of each board
 
@@ -27,7 +69,16 @@ Do this for each board, one at a time:
   ls /dev/cu.usbmodem*                                   # find the port, e.g. /dev/cu.usbmodem101
   python -m esptool --port /dev/cu.usbmodem101 read-mac
   ```
-  It prints `MAC: xx:xx:xx:xx:xx:xx`. On the ESP32-C6 the Wi-Fi station MAC used by the lab library is this base MAC.
+  It prints two lines, for example:
+  ```
+  MAC:                48:f6:ee:ff:fe:c7:20:f0
+  BASE MAC:           48:f6:ee:c7:20:f0
+  ```
+  Use the **BASE MAC** (6 bytes). The first line is the same address in an 8-byte form with `ff:fe` inserted in the middle. On the ESP32-C6, the Wi-Fi station MAC used by the lab library is the base MAC.
+- **Without resetting the board (macOS).** The board reports its MAC as its USB serial number:
+  ```sh
+  ioreg -r -c IOUSBHostDevice -l | grep -E '"USB Serial Number"|"locationID"'
+  ```
 - **From the flash log.** Every *Flash* prints the same `MAC: …` line near the top.
 - **From our firmware.** At boot, `p2p_protocol.c` and `p2p_unidirectional.c` print `This board's MAC is …`. If the MAC is not in `p2p_config.h`, they also print `MAC not listed in p2p_config.h`.
 
@@ -37,22 +88,52 @@ Put a sticker on each board (D1 = initiator, D2 = responder) so you don't mix th
 
 ## Checkpoint 1: message sequence diagram of the ideal path
 
-```mermaid
-sequenceDiagram
-    participant I as Initiator I (a_I)
-    participant R as Responder R (a_R)
-    Note over I,R: (0) pre-shared: n0, T, a_I, a_R, key K
-    I->>R: PING  ⟨a_I, nonce⟩ [n0]
-    Note right of R: check sender = a_I, tag, ñ = n0<br/>store n0+2 as expected
-    R->>I: PONG  ⟨a_R, nonce⟩ [n0+1]
-    Note left of I: check sender = a_R, tag, ñ = n0+1
-    I->>R: PING  ⟨a_I, nonce⟩ [n0+2]
-    R->>I: PONG  ⟨a_R, nonce⟩ [n0+3]
-    Note over I,R: … T rounds in total …
-    I->>R: END   ⟨a_I, nonce⟩ [n0+2T]
-```
+> *"Show the annotated message sequence diagram of the ideal path of P2P."* Task 2 adds: *"with description of messages and local computations in I and R."*
 
-`⟨…⟩` is authenticated but readable (associated data). `[…]` is encrypted. Both are covered by the 16-byte Ascon tag.
+The **ideal path** is the run where every frame arrives and every check passes. Lost frames, errors and attacks are left out here; they're the subject of checkpoint 2.
+
+### How we interpreted the lab text
+
+The lab text leaves the details to us. These are our decisions:
+
+| Question | Our decision |
+|---|---|
+| Identities a_I, a_R | the boards' Wi-Fi MAC addresses: a_I = `48:f6:ee:c7:1f:18`, a_R = `48:f6:ee:c7:20:f0` |
+| n0 | a fixed, randomly chosen 32-bit value, `0x3A7F12C4` (= 981406404), pre-shared in `p2p_config.h` |
+| T | the number of PING/PONG rounds; 5 by default |
+| Counter rule | every message carries the previous counter + 1. I's PINGs carry n0, n0+2, n0+4, … and R's PONGs carry n0+1, n0+3, … In round k (1…T), I sends n0 + 2(k−1) and R answers n0 + 2k − 1 |
+| How R knows what to expect | R stores e, the counter expected in the next PING (step (2)'s "stores it") |
+| How the run ends | step (4) only says "end the communication". We added an **END** message (counter n0 + 2T), so R knows the session finished properly and doesn't wait for a PING that will never come |
+| Encryption | task 7 adds Ascon AEAD. The diagram shows this final version: identities in the readable-but-authenticated part, the counter encrypted, plus a tag. With `P2P_USE_AEAD 0` the flow is identical, without nonce, encryption and tag |
+
+### The diagram
+
+![Message sequence diagram of the ideal path](diagrams/msc_ideal_path.png)
+
+### Walking through it
+
+- **(0) Pre-shared:** both boards are built from the same `p2p_config.h`: n0, T, both MACs and the 16-byte Ascon key K.
+- **(1) I starts.** When I boots, it sets k ← 0 and n ← n0. It builds a PING with a fresh random nonce, encrypts the counter, and sends it. Then it starts its timer W (2 s) and waits in `I_WAIT_PONG`.
+- **(2) R answers.** R verifies the Ascon tag, checks that the sender is ã_I = a_I and that ñ = n0, so this is a new session. It sets k ← 1, stores e ← ñ + 2 (the next PING it expects), replies with ñ + 1, starts its own timer, and moves to `R_IN_SESSION`.
+- **(3) I continues.** I stops its timer and verifies the tag, ã_R = a_R and ñ = n + 1. It counts the round (k ← k + 1). Since k < T, it sends the next PING with ñ + 1 and restarts its timer.
+- **(4) Repeat until k = T.** R checks each PING against e and answers. After the T-th PONG, I has k = T: it sends **END** with counter n0 + 2T and moves to `I_DONE`. R checks END against e, stops its timer and returns to `R_IDLE`. Both print a SUCCESS summary.
+
+### Concrete values (T = 5)
+
+| Round | PING from I | PONG from R |
+|---|---|---|
+| 1 | n0 = `3a 7f 12 c4` | n0+1 = `3a 7f 12 c5` |
+| 2 | n0+2 = `3a 7f 12 c6` | n0+3 = `3a 7f 12 c7` |
+| 3 | n0+4 = `3a 7f 12 c8` | n0+5 = `3a 7f 12 c9` |
+| 4 | n0+6 = `3a 7f 12 ca` | n0+7 = `3a 7f 12 cb` |
+| 5 | n0+8 = `3a 7f 12 cc` | n0+9 = `3a 7f 12 cd` |
+| end | END n0+10 = `3a 7f 12 ce` | |
+
+These are exactly the values seen on the boards (checkpoint 3) and on the air (checkpoint 5's plaintext capture).
+
+### Messages on the air
+
+**Message types:** `1` PING (I → R), `2` PONG (R → I), `3` END (I → R), `4` ERROR (R → I; never sent on the ideal path, see checkpoint 2).
 
 **Frame payload** (after the 24-byte 802.11 header and the 8-byte LLC/SNAP header `AA AA 03 69 69 69 69 69`):
 
@@ -65,6 +146,21 @@ sequenceDiagram
 | 24 | 4 | counter n, big-endian (network byte order) | encrypted |
 | 28 | 1 | error code (0 = none, 1 = out of sync) | encrypted |
 | 29 | 16 | Ascon tag | AEAD only |
+
+- **With AEAD:** 45 bytes. **Plaintext:** 29 bytes.
+- In the diagram's notation, `⟨…⟩` is associated data (readable, but covered by the tag) and `[…]` is encrypted.
+
+### Where each local computation lives in the code (`p2p_fsm.c`)
+
+| Step in the diagram | Function |
+|---|---|
+| build a message, random nonce, encrypt | `p2p_encode()` (nonce from `plat_random()`, the ESP32 hardware TRNG) |
+| verify the tag, check the sender identity | `p2p_decode()` |
+| I: start, send PING(n0) | `initiator_fsm()`, `case I_IDLE` / `case EV_START` |
+| I: check ñ = n + 1, count the round, next PING or END | `initiator_accept_pong()` |
+| R: check ñ = n0, start the session | `responder_start_session()` |
+| R: check ñ = e, store e ← ñ + 2, reply | `responder_accept_ping()` |
+| R: END received | `responder_fsm()`, `case R_IN_SESSION`, the `MSG_END` branch |
 
 ---
 
