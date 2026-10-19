@@ -86,12 +86,14 @@ void ecc_fieldModO(const uint32_t *A, uint32_t *result, uint8_t length);
 **Purpose**  
 Reduce a large integer `A` modulo the group order `n` using Barrett reduction; write the result to `result`.
 
+**Implementation limitation:** With `length == 8` and `A == n`, the fast path returns `n` unchanged instead of zero. The reducer is specialized for the 8-limb secp256r1 order; `length` is not an arbitrary-precision size parameter.
+
 **Parameters**
 
 | Name     | Type              | Description |
 |----------|-------------------|-------------|
-| `A`      | `const uint32_t*` | Input value (up to `length` limbs). |
-| `result` | `uint32_t*`       | Output `A mod n` (up to 9 limbs depending on use). |
+| `A`      | `const uint32_t*` | Input value of `length` limbs; outside the 8-limb fast path, provide at least 9 allocated limbs (zero-pad shorter values). |
+| `result` | `uint32_t*`       | Output buffer with space for 9 limbs. The 8-limb fast path writes only 8 limbs. |
 | `length` | `uint8_t`         | Limb count of `A`. |
 
 **Returns**  
@@ -207,81 +209,19 @@ Same as [ecc_ec_mult](#ecc_ec_mult).
 
 ### ecc_ecdsa_validate
 
-```c
-int ecc_ecdsa_validate(const uint32_t *x, const uint32_t *y, const uint32_t *e, const uint32_t *r, const uint32_t *s);
-```
-
-**Purpose**  
-Verify an ECDSA signature `(r, s)` over hash `e` with public key `(x, y)` on secp256r1.
-
-**Parameters**
-
-| Name | Type              | Description |
-|------|-------------------|-------------|
-| `x`  | `const uint32_t*` | Public key X (8 limbs). |
-| `y`  | `const uint32_t*` | Public key Y (8 limbs). |
-| `e`  | `const uint32_t*` | Message digest (8 limbs). |
-| `r`  | `const uint32_t*` | Signature `r` (8 limbs). |
-| `s`  | `const uint32_t*` | Signature `s` (8 limbs). |
-
-**Returns**  
-- `int` — `0` if the signature is valid; `-1` otherwise.
-
-**Global State Modified**  
-- None.
+Declared in `ecc.h`, but unavailable in this build because its implementation is commented out. Calling it causes an undefined-symbol linker error.
 
 ---
 
 ### ecc_ecdsa_sign
 
-```c
-int ecc_ecdsa_sign(const uint32_t *d, const uint32_t *e, const uint32_t *k, uint32_t *r, uint32_t *s);
-```
-
-**Purpose**  
-Create an ECDSA signature `(r, s)` over hash `e` using private key `d` and per-message nonce `k` (must be unique and unpredictable).
-
-**Parameters**
-
-| Name | Type              | Description |
-|------|-------------------|-------------|
-| `d`  | `const uint32_t*` | Private key (8 limbs). |
-| `e`  | `const uint32_t*` | Message digest (8 limbs). |
-| `k`  | `const uint32_t*` | Per-message nonce (8 limbs). |
-| `r`  | `uint32_t*`       | Output signature `r` (8 limbs). |
-| `s`  | `uint32_t*`       | Output signature `s` (8 limbs). |
-
-**Returns**  
-- `int` — `0` on success; `-1` on failure (e.g., invalid `k`, degenerate values).
-
-**Global State Modified**  
-- None.
+Declared in `ecc.h`, but unavailable in this build because its implementation is commented out. Calling it causes an undefined-symbol linker error.
 
 ---
 
 ### ecc_is_valid_key
 
-```c
-int ecc_is_valid_key(const uint32_t *priv_key);
-```
-
-**Purpose**  
-Check whether `priv_key` is a valid secp256r1 private key (typically `0 < priv_key < n`, where `n` is the group order).
-
-**Parameters**
-
-| Name       | Type              | Description |
-|------------|-------------------|-------------|
-| `priv_key` | `const uint32_t*` | Candidate private key (8 limbs). |
-
-**Returns**  
-- `int` — nonzero if valid; `0` if invalid.
-
-**Global State Modified**  
-- None.
-
-**See also**  
-- [ecc_gen_pub_key](#ecc_gen_pub_key).
+Declared in `ecc.h`, but unavailable in this build because its implementation is commented out. Calling it causes an undefined-symbol linker error.
 
 ---
 
@@ -314,29 +254,7 @@ $$ (pub\_x,\, pub\_y) = \text{priv\_key} \cdot G $$
 
 ### ecc_ec_double
 
-```c
-void ecc_ec_double(const uint32_t *px, const uint32_t *py, uint32_t *Dx, uint32_t *Dy);
-```
-
-**Purpose**  
-Elliptic-curve point doubling:
-
-$$ (Dx,\, Dy) = 2 \cdot (px,\, py) $$
-
-**Parameters**
-
-| Name | Type              | Description |
-|------|-------------------|-------------|
-| `px` | `const uint32_t*` | Point X (8 limbs). |
-| `py` | `const uint32_t*` | Point Y (8 limbs). |
-| `Dx` | `uint32_t*`       | Output doubled X (8 limbs). |
-| `Dy` | `uint32_t*`       | Output doubled Y (8 limbs). |
-
-**Returns**  
-- `void`.
-
-**Global State Modified**  
-- None.
+Declared in `ecc.h`, but unavailable in this build because its implementation is commented out. Calling it causes an undefined-symbol linker error.
 
 ---
 
@@ -484,7 +402,7 @@ Reduce a large integer `B` modulo the secp256r1 prime `p`, writing the reduced v
 | Name | Type              | Description |
 |------|-------------------|-------------|
 | `A`  | `uint32_t*`       | Output reduced value (8 limbs). May alias `B`. |
-| `B`  | `const uint32_t*` | Input value to reduce (up to 16 limbs). |
+| `B`  | `const uint32_t*` | Input buffer of 16 limbs; shorter values must be padded with zeros to 16 limbs. |
 
 **Returns**  
 - `void`.

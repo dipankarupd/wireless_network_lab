@@ -98,7 +98,7 @@ Convert a MAC address string like `"aa:bb:cc:dd:ee:ff"` into a 6-byte array.
 | `str_mac` | `char*`                 | Input MAC address string (`"xx:xx:xx:xx:xx:xx"`). |
 
 **Returns**  
-- `int` — `1` on success; `0` on parse failure.
+- `int` — `1` when six hexadecimal fields are parsed; `0` otherwise. Values above `0xFF` are truncated to bytes, and trailing text is not rejected.
 
 **Global State Modified**  
 - None.
@@ -123,10 +123,10 @@ Allocate and populate an IEEE 802.11 frame structure for transmission, setting t
 | `data_size` | `uint16_t`  | Size of the payload in bytes. |
 
 **Returns**  
-- `ieee80211_frame_t*` — Pointer to the created frame on success; may be `NULL` on allocation/validation failure.
+- `ieee80211_frame_t*` — Pointer to the allocated frame. The current implementation does not validate arguments or check allocation failure; allocation failure causes an invalid memory access rather than a safe `NULL` return. The caller must free the returned frame.
 
 **Global State Modified**  
-- None (expected).
+- None; reads `local_mac_addr` to populate the source address.
 
 ---
 
@@ -195,7 +195,7 @@ Timeout callback that signals a timeout event to the FSM by sending an event = 0
 - `void` — no return value.
 
 **Global State Modified**  
-- Sends a `event_t` with `event = 0` to the global queue `fsm_event_queue`.
+- Attempts to send an `event_t` with `event = 0` to the global queue `fsm_event_queue`. The nonblocking send drops the event if the queue is full.
 
 **See also**  
 - [start_timeout_timer](#start_timeout_timer) — to (re)start the timer that ultimately triggers this callback.

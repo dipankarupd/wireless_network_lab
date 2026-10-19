@@ -83,8 +83,8 @@ static inline int is_zero_256(const uint32_t a[8]) {
  * @note Uses @c esp_fill_random() to obtain 256 bits of entropy from the
  *       ESP32 hardware RNG.
  * @note This function loops until a valid scalar is drawn. In practice, the
- *       probability of rejection is negligible (~50% chance of redrawing if
- *       candidate ≥ n, and vanishingly small chance of all-zero).
+ *       probability of rejection for a uniform 256-bit candidate is approximately
+ *       2^-32 (candidate >= n or zero), so almost every draw is accepted.
  *
  * @warning The generated scalar is secret material and must be protected
  *          against leakage. Do not print or log its value in production.

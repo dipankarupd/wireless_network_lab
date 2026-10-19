@@ -50,6 +50,7 @@ void ecc_ec_mult(const uint32_t *px, const uint32_t *py, const uint32_t *secret,
 static inline void ecc_ecdh(const uint32_t *px, const uint32_t *py, const uint32_t *secret, uint32_t *resultx, uint32_t *resulty) {
 	ecc_ec_mult(px, py, secret, resultx, resulty);
 }
+// ECDSA and private-key validation are declared but have no active implementation.
 int ecc_ecdsa_validate(const uint32_t *x, const uint32_t *y, const uint32_t *e, const uint32_t *r, const uint32_t *s);
 int ecc_ecdsa_sign(const uint32_t *d, const uint32_t *e, const uint32_t *k, uint32_t *r, uint32_t *s);
 
@@ -62,6 +63,7 @@ static inline void ecc_gen_pub_key(const uint32_t *priv_key, uint32_t *pub_x, ui
 
 //ec Functions
 void ecc_ec_add(const uint32_t *px, const uint32_t *py, const uint32_t *qx, const uint32_t *qy, uint32_t *Sx, uint32_t *Sy);
+// Declared only: the exported point-doubling implementation is commented out.
 void ecc_ec_double(const uint32_t *px, const uint32_t *py, uint32_t *Dx, uint32_t *Dy);
 
 //simple Functions for addition and substraction of big numbers
@@ -112,7 +114,7 @@ int ecc_fieldMult(const uint32_t *x, const uint32_t *y, uint32_t *result, uint8_
  * a series of additions and subtractions, avoiding a costly division.
  *
  * @param[out] A       Result of the modular reduction (arrayLength = 8 limbs, 256 bits).
- * @param[in]  B       Input value to reduce (up to 16 limbs, 512 bits, e.g., from a multiplication).
+ * @param[in]  B       Input buffer of 16 limbs (512 bits); zero-pad shorter values.
  *
  * @note The input and output pointers may reference the same memory location.
  * @note This function is not constant-time and should not be used with secret data
