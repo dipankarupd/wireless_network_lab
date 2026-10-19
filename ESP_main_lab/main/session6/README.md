@@ -4,11 +4,10 @@
 |---|---|
 | `p2p_config.h` | Pre-shared constants (MACs, n0, T, key), timing, AEAD switch, fault injection |
 | `p2p_unidirectional.c` | Task 1: I sends a frame every 2 s, R cycles the LED on receive |
-| `p2p_fsm.h` / `p2p_fsm.c` | Tasks 2–7: the two state machines. Platform independent, so the same file runs on the boards and in the simulator |
+| `p2p_fsm.h` / `p2p_fsm.c` | Tasks 2–7: the two state machines, message encoding and checks |
 | `p2p_protocol.c` | ESP32 side: radio frames, timer, LED, logging, `app_main` |
 | `diagrams/msc_ideal_path.png` | Message sequence diagram of the ideal path (checkpoint 1) |
 | `diagrams/fsm_initiator.png`, `diagrams/fsm_responder.png` | The two state diagrams (checkpoint 2) |
-| `../../../Prosim/p2p/` | Laptop simulator running the same `p2p_fsm.c` (Appendix C, learning goal 4) |
 
 ## What Session 6 asks
 
@@ -218,7 +217,6 @@ A resent frame is byte-for-byte identical, so under AEAD the same nonce is reuse
 
 - **Deadlock** (both sides waiting for each other forever) cannot happen. Every waiting state has a timer: I resends and finally gives up, and R abandons a silent session.
 - **Livelock** (looping without progress) is bounded. I resends at most `P2P_MAX_RETRIES` times, and a duplicate never advances the counters.
-- **Checked in the simulator:** 50,000+ random runs with loss, duplicates, bit errors and replays. No run ended in deadlock, livelock or an inconsistent state (see below).
 
 ### Why MAC-layer ARQ is not enough (C.3.2)
 
@@ -232,23 +230,13 @@ The 802.11 hardware already ACKs unicast frames and retransmits when no ACK arri
 
 In Wireshark, look at the *Retry* bit in the Frame Control field to see MAC retransmissions.
 
-### Tested in the simulator before flashing
-
-`Prosim/p2p` runs the same `p2p_fsm.c` on the laptop over a simulated channel with loss, duplicates, bit errors, an attacker replaying recorded frames, R switched on late, and R rebooting. It found and fixed three problems:
-
-1. R gave up (after 10 s) while I was still resending (until 18 s), so the session died with an ERROR. R's patience is now 20 s.
-2. A duplicate PING did not reset R's silence counter.
-3. A replayed old PING made R abort the session, a cheap denial-of-service attack. R now drops it.
-
-See `Prosim/p2p/README.md` for the commands and the numbers.
-
 ---
 
 ## Checkpoint 3: code walk-through
 
-**`p2p_fsm.c`** holds the protocol and is shared by the ESP32 and the simulator:
+**`p2p_fsm.c`** holds the protocol logic:
 - `p2p_encode` / `p2p_decode` build and verify the payload above: magic, sender identity, then `ascon_aead_encrypt` / `ascon_aead_decrypt`.
-- `radio_send` sends a frame, with the optional simulated loss and corruption for checkpoint 4. `resend_last` repeats the identical frame.
+- `radio_send` sends a frame, with the fault injection used in checkpoint 4 (`P2P_SIMULATE_LOSS_EVERY`, `P2P_SIMULATE_CORRUPT_EVERY`). `resend_last` repeats the identical frame.
 - `initiator_fsm` / `responder_fsm` are the two state machines: outer switch on the state, inner switch on the event, then the guard chain for frames.
 - `p2p_handle_event` is the single entry point: it decodes a frame, then calls the right FSM for the party's role.
 - The state machines reach the outside world only through seven `plat_*` functions: send, timer start/stop, LED, random bytes, clock, delay and log.
@@ -309,8 +297,6 @@ Notes on reading the logs:
 | 4a | R reboots mid-run | ERROR message, I stops immediately | ✅ I: FAILED (responder reported error), the correct outcome |
 | 4b | I reboots mid-run | R restarts the session from n0 | ✅ SUCCESS 50/50 on both |
 | 4c | R unplugged mid-run | bounded retries, no deadlock | ✅ I: FAILED (timeout) after 8 resends, the correct outcome |
-| 4d (optional) | R switched on late | I resends until R answers | not run yet |
-| 5 (optional) | wrong key on one board | a stranger without the key gets nothing accepted | not run yet |
 
 ---
 
@@ -446,7 +432,7 @@ Without encryption, the protocol only notices changes that happen to break the c
 
 ### Test 4: Physical events
 
-**Setting for all of 4a–4d:** `P2P_T 50`. A run then lasts about 25 s, which leaves time to press buttons or pull cables. One build covers all of them.
+**Setting for all of 4a–4c:** `P2P_T 50`. A run then lasts about 25 s, which leaves time to press buttons or pull cables. One build covers all of them.
 
 #### Test 4a: Responder reboots mid-run (the ERROR message)
 **Action:** press RST on the responder board during the run.
@@ -553,36 +539,18 @@ I (25678) P2P-I: frames sent/resent : 15 / 8
 - **Bounded retries:** I resends a limited number of times, then stops (I-3, then I-8).
 - **No deadlock:** a protocol without a timeout would wait in `I_WAIT_PONG` forever. Ours always reaches a final state.
 - **The summary is consistent:** 14/50 rounds, 15 frames sent (14 PINGs plus the unanswered one), 8 resends.
-- **R's patience is deliberately longer.** R waits 10 × 2 s = 20 s (`P2P_MAX_RETRIES + 2` timeouts), longer than I's 18 s. If R were alive but cut off, it would never give up before I does. The simulator found this ordering bug before flashing (see "Tested in the simulator before flashing").
-
-#### Test 4d (optional, not run yet): Responder not ready at the start
-**Action:** unplug R, start a run on I, then plug R back in within about 15 s.
-
-**Expected:** I shows a few `TIMEOUT: resending PING n=981406404 (k/8)` lines, then the rounds continue normally to `SUCCESS`. The start order doesn't matter, because I keeps resending until R answers.
+- **R's patience is deliberately longer.** R waits 10 × 2 s = 20 s (`P2P_MAX_RETRIES + 2` timeouts), longer than I's 18 s. If R were alive but cut off, it would never give up before I does.
 
 **Reset after Test 4:** `P2P_T 5`
 
 ---
 
-### Test 5 (optional, not run yet): A stranger with the wrong key
-
-**Action:** two different builds:
-1. Build normally and flash I only.
-2. Change one byte of `P2P_KEY` (e.g. `0x54` → `0x55`), build, and flash R only.
-
-**Expected:** R prints `invalid_drop: AEAD tag verification failed (tampered or wrong key)` for **every** frame. I shows 8 timeouts, then `FAILED (timeout)`. Someone without the key can't get a single frame accepted.
-
-**Afterwards:** change the key byte back, build, and flash R again, so both boards match.
-
----
-
-### Other knobs (optional)
+### Task 6 extras: stress and distance (not part of the runs above)
 
 | Demo | Setting / action | What to look for |
 |---|---|---|
 | Stress | `P2P_T 10000`, `P2P_ROUND_DELAY_MS 0` | progress every 1000 rounds; compare rounds/s and resends in the summary |
 | Distance (task 6) | `P2P_T 50`, move the boards apart (other room, behind walls) | more `TIMEOUT` and `duplicate` lines and higher `resent` as the signal drops toward the noise floor |
-| Replay attack | not possible with two boards; use the simulator: `./p2psim -r 0.2` in `Prosim/p2p` | replayed old frames are dropped (`replay_drop`) |
 
 ### What to show at the checkpoint
 
@@ -704,7 +672,7 @@ be 7a 65 a5 0a                                     encrypted counter + code     
 5. **The cost:** 16 extra bytes per frame (the tag) and the Ascon computation. The run took the same time (about 2 s) in both modes.
 6. **What still leaks:** message type, sender, frame length and timing. That allows traffic analysis, as listed in the security analysis below.
 
-**Task 9 extra (changing the order of frames):** replaying captured frames from Wireshark isn't practical with this setup. The simulator shows the effect instead: `./p2psim -r 0.2` in `Prosim/p2p` replays recorded frames, and the receiver drops them as `replay_drop` because their counters are stale.
+**Task 9 extra (changing the order of frames):** re-sending captured frames from Wireshark isn't practical with this setup. By design, a frame received out of order or replayed carries a stale counter, so the receiver drops it (`replay_drop`) or answers it as a duplicate. It never moves the protocol forward.
 
 ---
 
@@ -719,7 +687,7 @@ be 7a 65 a5 0a                                     encrypted counter + code     
 
 **Remaining weaknesses** (good discussion points, and the motivation for Session 7):
 1. **Cross-session replay.** n0 and K are static, so a recorded session can be replayed to R message by message and R will accept it. The fix is a fresh random challenge per session and a session key derived from it (Session 7's protocol).
-2. **Reset DoS.** Replaying a recorded PING(n0) makes R restart its session. In the simulator this caused 42 of 43 checked failures under a replay attack. The same fix applies.
+2. **Reset DoS.** Replaying a recorded PING(n0) makes R restart its session. The same fix applies.
 3. **Metadata leakage.** Message type, sender and timing are visible, which allows traffic analysis.
 4. **Jamming and flooding** cannot be prevented by cryptography (Session 10).
 5. **Hard-coded key** in the firmware: anyone who reads the flash of one board can impersonate both.
