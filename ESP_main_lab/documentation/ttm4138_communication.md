@@ -8,7 +8,7 @@ Cross-references use `#` links for quick navigation.
 
 ## Receiving packets
 
-After [setup](./ttm4138_setup.md), received packets are added to the queue `fsm_event_queue`. Below is an example of how to receive messages from that queue. You may choose to handle them differently based on your code’s requirements, but remember to free the received frame; otherwise, the code will eventually crash as memory fills up with packets. This example function only accepts messages that match the layout of the specified struct `YOUR_MESSAGE_STRUCT_HERE`. If you need it to handle multiple message types, you will have to modify it accordingly.
+After [setup](./ttm4138_setup.md), received packets are added to the queue `fsm_event_queue`. Below is an example of how to receive messages from that queue. You may choose to handle them differently based on your code’s requirements, but remember to free the received frame; otherwise, the code will eventually crash as memory fills up with packets. Replace `YOUR_MESSAGE_STRUCT_HERE` with your payload type and define `TIMEOUT_MS`. This example checks that the frame contains enough bytes for that type, copies one payload, frees the frame, and returns. It does not validate the sender, protocol, or message type; add those checks for your protocol. It continues waiting after timeouts.
 
 ```c
 void GetMessage(YOUR_MESSAGE_STRUCT_HERE* protocol_message) {
@@ -16,10 +16,13 @@ void GetMessage(YOUR_MESSAGE_STRUCT_HERE* protocol_message) {
     while (1) {
         if (xQueueReceive(fsm_event_queue, &event, pdMS_TO_TICKS(TIMEOUT_MS))) {
             if (event.event == 1) {
-                // Copy your protocol payload out of the received frame.
-                memcpy(protocol_message, received_frame_info.frame->data, sizeof(*protocol_message));
-                // Always free the frame buffer after processing to avoid memory leaks.
-                free(event.frame); // id 1
+                // Check the payload bounds before copying.
+                if (event.length >= offsetof(ieee80211_frame_t, data) + sizeof(*protocol_message)) {
+                    memcpy(protocol_message, event.frame->data, sizeof(*protocol_message));
+                    free(event.frame);
+                    return;
+                }
+                free(event.frame);
             }
         }
     }
@@ -29,6 +32,8 @@ Also remember to include the following headers:
 
 ```c
 #include <string.h>              // for memcpy
+#include <stddef.h>              // for offsetof
+#include <stdlib.h>              // for free
 #include <freertos/FreeRTOS.h>   // core FreeRTOS definitions
 #include <freertos/queue.h>      // xQueueReceive, queue types
 
@@ -83,13 +88,13 @@ void print_frame(void* arg);
 Continuously consume received frames from the FSM event queue, convert each frame to a hex string, and print it. Intended as a FreeRTOS task entry function for piping received frames to a console/host.
 
 **Parameters**  
-(none)
+- `arg` (`void*`): unused FreeRTOS task argument.
 
 **Returns**  
 - `void` — no return value (loops indefinitely).
 
 **Global State Modified**  
-- Drains from global `fsm_event_queue`; frees each received frame buffer after printing.
+- Drains from global `fsm_event_queue`; frees each received frame buffer after successful printing. If hex-string allocation fails, the current implementation skips freeing that frame and leaks it.
 
 **See also**  
 - Produces output for frames queued by: [fsm_callback_targeted_listen](#fsm_callback_targeted_listen), [fsm_callback_promiscious](#fsm_callback_promiscious), and [fsm_callback_unicast](#fsm_callback_unicast).

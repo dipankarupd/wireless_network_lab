@@ -257,9 +257,11 @@ static void fieldModP(uint32_t *A, const uint32_t *B)
  * n is the order of the eliptic curve.
  * A and result could point to the same value
  *
- * A: input value (max size * 4 bytes)
- * result: result of modulo calculation (max 36 bytes)
- * size: size of A
+ * A: input value of length limbs; outside the 8-limb fast path,
+ *    at least 9 allocated limbs are required (zero-pad shorter values).
+ * result: allocate 9 limbs; the 8-limb fast path writes only 8.
+ * length: input limb count for the fixed 8-limb secp256r1 order.
+ * Known limitation: length == 8 and A == n returns n unchanged, not zero.
  *
  * This uses the Barrett modular reduction as described in the Handbook 
  * of Applied Cryptography 14.42 Algorithm Barrett modular reduction, 
@@ -811,7 +813,7 @@ int ecc_fieldMult(const uint32_t *x, const uint32_t *y, uint32_t *result, uint8_
  * a series of additions and subtractions, avoiding a costly division.
  *
  * @param[out] A       Result of the modular reduction (arrayLength = 8 limbs, 256 bits).
- * @param[in]  B       Input value to reduce (up to 16 limbs, 512 bits, e.g., from a multiplication).
+ * @param[in]  B       Input buffer of 16 limbs (512 bits); zero-pad shorter values.
  *
  * @note The input and output pointers may reference the same memory location.
  * @note This function is not constant-time and should not be used with secret data
@@ -827,9 +829,11 @@ void ecc_fieldModP(uint32_t *A, const uint32_t *B)
  * n is the order of the eliptic curve.
  * A and result could point to the same value
  *
- * A: input value (max size * 4 bytes)
- * result: result of modulo calculation (max 36 bytes)
- * size: size of A
+ * A: input value of length limbs; outside the 8-limb fast path,
+ *    at least 9 allocated limbs are required (zero-pad shorter values).
+ * result: allocate 9 limbs; the 8-limb fast path writes only 8.
+ * length: input limb count for the fixed 8-limb secp256r1 order.
+ * Known limitation: length == 8 and A == n returns n unchanged, not zero.
  *
  * This uses the Barrett modular reduction as described in the Handbook 
  * of Applied Cryptography 14.42 Algorithm Barrett modular reduction, 
