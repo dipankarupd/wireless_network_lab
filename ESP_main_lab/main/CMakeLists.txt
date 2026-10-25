@@ -6,12 +6,14 @@
 #   session6/p2p_unidirectional.c      Session 6 task 1: one-way frames + LED
 #   session6/p2p_protocol.c            Session 6 tasks 2-9: P2P ping-pong FSM (+ Ascon AEAD)
 #                                      (also needs session6/p2p_fsm.c, the shared state machines)
+#   session9/sae_protocol.c            Session 9 tasks: MP-SAE (Protocol B) password-authenticated key exchange
+#                                      (also needs session9/sae_mp.c, the shared protocol core)
 #   tools/sniffer.c                    Appendix B Wireshark sniffer
 #   tools/test.c                       LED / button test
 #   tools/boilerplate_peer_to_peer.c   Course FSM template (reference only)
-set(LAB_APP "session6/p2p_protocol.c" "session6/p2p_fsm.c")
+set(LAB_APP "session9/sae_protocol.c" "session9/sae_mp.c")
 
 idf_component_register(SRCS ${LAB_APP}
                     PRIV_REQUIRES auth aead ecc hash ttm4138_ecc ttm4138_communication ttm4138_utils global_variables ttm4138_setup
-                    INCLUDE_DIRS "." "session6"
+                    INCLUDE_DIRS "." "session6" "session9"
                     REQUIRES nvs_flash driver esp_wifi esp_driver_gpio esp_hw_support esp_timer bootloader_support)
