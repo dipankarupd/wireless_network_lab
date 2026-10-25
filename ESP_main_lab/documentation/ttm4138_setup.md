@@ -171,14 +171,14 @@ Configure the device for **unicast communication** with a peer.
 | Name         | Type       | Description |
 |--------------|------------|-------------|
 | `timeout_ms` | `uint16_t` | Timeout period for the one-shot timer, in milliseconds. |
-| `receiver`   | `char*`    | NUL-terminated, colon-separated MAC string of the peer (e.g., `"AA:BB:CC:DD:EE:FF"`). |
+| `peer`       | `char*`    | NUL-terminated, colon-separated MAC string of the peer (e.g., `"AA:BB:CC:DD:EE:FF"`). |
 
 **Returns**  
 - `void` — no return value.
 
 **Global State Modified**  
 - `initiator_mac_addr_string` set to local STA MAC string.  
-- `responder_mac_addr_string` set to `receiver`.  
+- `responder_mac_addr_string` set to `peer`.
 - Common setup side effects via [setup](#setup).  
 
 **Notes**  

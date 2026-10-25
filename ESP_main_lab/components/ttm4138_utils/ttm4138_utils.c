@@ -76,7 +76,8 @@ void print_bytes(uint8_t* start, uint16_t length) {
  * @param mac      Output byte array (6 bytes).
  * @param str_mac  Input MAC address string in hex.
  *
- * @return 1 on success, 0 on failure.
+ * @return 1 if six hexadecimal fields are parsed, 0 otherwise.
+ * @note Fields above 0xFF are truncated to bytes; trailing text is accepted.
  */
 int strmac_to_mac(uint8_t mac[MAC_ADDR_LEN], char* str_mac) {
     unsigned int temp[6];
@@ -119,7 +120,8 @@ void cycle_light() {
 /**
  * @brief Timeout callback that sends a timeout event to the FSM queue.
  *
- * Sends a frame info struct with contains_frame = 0 to signal a timeout.
+ * Attempts to enqueue an event_t with event = 0 to signal a timeout.
+ * The nonblocking send drops the event if the queue is full.
  */
 void on_timeout() {
     event_t received_frame_info = { .event = 0 };

@@ -61,7 +61,9 @@ void configure_wifi(receive_mode_t receive_mode) {
  * @param data       Pointer to payload data.
  * @param data_size  Size of payload data in bytes.
  *
- * @note Caller is responsible for freeing the memory.
+ * @note Caller is responsible for freeing the memory. Arguments and allocation
+ *       success are not checked; allocation failure causes invalid memory access.
+ *       Reads local_mac_addr to populate the source address.
  * 
  * @return Pointer to the allocated and initialized frame structure.
  */
@@ -107,9 +109,9 @@ esp_err_t transmit(uint8_t dest_addr[], uint8_t data[], uint16_t data_size) {
 /**
  * @brief Promiscuous mode callback for targeted frame reception.
  *
- * Processes all incoming Wi-Fi packets, checks if the destination MAC
- * matches the configured target, and forwards matching frames to the
- * FSM event queue.
+ * Processes all incoming Wi-Fi packets, checks if either addr1 (receiver)
+ * or addr2 (transmitter) matches the configured target, and forwards matching
+ * frames to the FSM event queue.
  *
  * @param buf   Pointer to the received packet buffer.
  * @param type  Not used.
@@ -204,14 +206,15 @@ void fsm_callback_unicast(void* buf, wifi_promiscuous_pkt_type_t type) {
 /**
  * @brief Print received Wi-Fi frames in hexadecimal format for sniffing.
  *
- * Continuously reads frames from the FSM event queue, converts the payload
- * to a hex string, and prints it to the console. Used for sending frames 
+ * Continuously reads frames from the FSM event queue, converts each entire
+ * received frame to a hex string, and prints it to the console. Used for sending frames 
  * from microcontroller to desktop computer.
  *
  * @param arg Not used.
  *
  * @note Allocates memory for the hex string per frame; memory is freed
- *       after printing. The received frame's memory is also freed after use.
+ *       after printing. The received frame is freed after successful printing,
+ *       but leaks if allocation of the hex string fails.
  */
 void print_frame(void* arg){
     event_t received_frame_info;
